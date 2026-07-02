@@ -1,0 +1,15 @@
+name: keep-alive
+# Pings the Render service every ~12 min so the free instance never spins down.
+on:
+  schedule:
+    - cron: "*/12 * * * *"
+  workflow_dispatch: {}
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping server
+        run: |
+          echo "Pinging at $(date -u)"
+          code=$(curl -s -o /dev/null -w "%{http_code}" -m 60 https://or-yakar-mcp.onrender.com/ || echo "000")
+          echo "HTTP status: $code (any response means the instance is awake)"
