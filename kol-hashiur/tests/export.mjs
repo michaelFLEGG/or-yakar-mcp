@@ -1,0 +1,31 @@
+import { chromium } from 'playwright-core';
+const T = '/tmp/claude-0/-home-user-or-yakar-mcp/f9cc8d6e-a55d-5c1b-a5b6-9431b5dd331b/scratchpad/t';
+const url = 'http://127.0.0.1:8765/index.html';
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 }, acceptDownloads: true });
+const page = await ctx.newPage();
+const errs = [];
+page.on('console', (m) => { if (['error', 'warning'].includes(m.type())) errs.push(m.type() + ': ' + m.text()); });
+page.on('pageerror', (e) => errs.push('PAGEERR: ' + e.message));
+await page.goto(url);
+await page.setInputFiles('#file', T + '/sample.wav');
+await page.waitForSelector('#studio:not(.hide)', { timeout: 20000 });
+const presetName = process.argv[2] || 'לנהיגה';
+const fmts = (process.argv[3] || 'mp3').split(',');
+await page.click(`#presets button:has-text("${presetName}")`);
+await page.waitForTimeout(4000);
+for (const f of fmts) {
+  await page.selectOption('#fmt', f);
+  const t0 = Date.now();
+  await page.click('#bMake');
+  await page.waitForFunction(() => /הסתיים|נכשלה|בוטלה/.test(document.getElementById('progTxt').textContent), null, { timeout: 180000 });
+  console.log(f, 'status:', await page.$eval('#progTxt', (e) => e.textContent), 'ms', Date.now() - t0);
+  const links = await page.$$eval('#dl a', (as) => as.map((a) => a.textContent));
+  console.log(links);
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#dl a')]);
+  const p = T + '/out_' + f + '.' + dl.suggestedFilename().split('.').pop();
+  await dl.saveAs(p);
+  console.log('saved', p, dl.suggestedFilename());
+}
+console.log('errors', JSON.stringify(errs));
+await browser.close();

@@ -1,0 +1,30 @@
+import { chromium } from 'playwright-core';
+const T = '/tmp/claude-0/-home-user-or-yakar-mcp/f9cc8d6e-a55d-5c1b-a5b6-9431b5dd331b/scratchpad/t';
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+const c = await b.newContext({ viewport: { width: 1000, height: 800 } });
+const p = await c.newPage();
+const errs = []; p.on('pageerror', (e) => errs.push(e.message));
+await p.goto('http://127.0.0.1:8765/index.html');
+await p.waitForTimeout(1500);
+console.log('sw ready:', await p.evaluate(async () => { const r = await navigator.serviceWorker.ready; return r.active && r.active.state; }));
+const man = await p.evaluate(async () => { const l = document.querySelector('link[rel=manifest]').href; const r = await fetch(l); return r.json(); });
+console.log('manifest:', man.name, man.display, man.icons.map((i) => i.sizes + ':' + i.purpose).join(','), 'lang', man.lang, 'dir', man.dir);
+for (const i of man.icons) { const r = await p.evaluate(async (u) => { const x = await fetch(u); return x.status + ' ' + x.headers.get('content-type'); }, new URL(i.src, 'http://127.0.0.1:8765/').href); console.log(' icon', i.src, r); }
+await c.setOffline(true);
+await p.reload(); await p.waitForTimeout(800);
+console.log('offline title:', await p.title(), '| h1:', await p.$eval('h1', (e) => e.textContent));
+await p.setInputFiles('#file', T + '/sample.mp3');
+await p.waitForSelector('#studio:not(.hide)', { timeout: 15000 });
+await p.click('#bPlay'); await p.waitForTimeout(1000);
+console.log('offline plays:', await p.$eval('#timeLbl', (e) => e.innerText), 'worklet', await p.evaluate(() => A.workletReady));
+await c.setOffline(false);
+// standalone file
+const p2 = await (await b.newContext({ viewport: { width: 1000, height: 800 } })).newPage();
+p2.on('pageerror', (e) => errs.push('standalone: ' + e.message));
+await p2.goto('file:///home/user/or-yakar-mcp/kol-hashiur/dist/%D7%A1%D7%98%D7%95%D7%93%D7%99%D7%95%20%D7%A7%D7%95%D7%9C%20%D7%94%D7%A9%D7%99%D7%A2%D7%95%D7%A8.html');
+await p2.setInputFiles('#file', T + '/sample.mp3');
+await p2.waitForSelector('#studio:not(.hide)', { timeout: 15000 });
+await p2.click('#bPlay'); await p2.waitForTimeout(1000);
+console.log('standalone plays:', await p2.$eval('#timeLbl', (e) => e.innerText), 'install btn hidden:', await p2.$eval('#btnInstall', (e) => e.classList.contains('hide')), 'download link hidden:', await p2.$eval('#aDownload', (e) => e.classList.contains('hide')));
+console.log('errors', JSON.stringify(errs));
+await b.close();

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>סטודיו קול השיעור</title>
+<meta name="description" content="עיבוד הקלטות שיעורים בדפדפן, בלי שרת. הכל נשאר אצלך.">
+<meta name="theme-color" content="#0b6b63">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="קול השיעור">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!--HEAD_LINKS-->
+<style>
+/*CSS*/
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>סטודיו קול השיעור</h1>
+  <div class="toolbar-r">
+    <button id="btnInstall" class="hide primary">התקן כאפליקציה</button>
+    <button id="btnTheme" aria-label="החלפת מצב תצוגה">מצב תצוגה: אוטומטי</button>
+    <button id="btnHelp">עזרה</button>
+  </div>
+</header>
+<p class="small" style="margin:0">כל העיבוד נעשה אצלך במכשיר. שום קובץ לא נשלח לשום מקום.</p>
+
+<section class="card" id="intake">
+  <h2>א. הקלטה</h2>
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="גרור לכאן הקלטה או לחץ לבחירה">
+    גרור לכאן הקלטה או לחץ לבחירה
+    <small>קבצי קול ווידאו: אם-פי-3, אם-פי-4-אי, וייב, אוג, אופוס, ווב-אם, איי-איי-סי ואם-פי-4</small>
+  </div>
+  <input type="file" id="file" class="hide" accept="audio/*,video/mp4,.mp3,.m4a,.wav,.ogg,.opus,.webm,.aac,.mp4">
+  <div class="row" style="margin-top:10px">
+    <button id="btnRec" class="primary">הקלט עכשיו</button>
+  </div>
+  <div class="rec" id="recPanel">
+    <div><span class="clock" id="recClock">0:00</span></div>
+    <div class="meter" aria-hidden="true"><i id="recMeter"></i></div>
+    <div class="row">
+      <button id="btnRecPause">השהה</button>
+      <button id="btnRecStop" class="warn">עצור והשתמש בהקלטה</button>
+    </div>
+  </div>
+  <div id="loadMsg" class="msg hide" role="status"></div>
+  <div class="chips" id="info"></div>
+</section>
+
+<section class="card hide" id="studio">
+  <h2>ב. גל הקול והניגון</h2>
+  <div class="wavebox"><div class="cap">המקור</div><div id="waveO" class="wave"></div></div>
+  <div class="wavebox"><div class="cap">המעובד</div><div id="waveP" class="wave"></div></div>
+  <div class="time" id="timeLbl">0:00 / 0:00</div>
+  <div class="transport">
+    <button id="bPlay" class="big primary">נגן</button>
+    <button id="bB15" class="big">אחורה 15 שניות</button>
+    <button id="bF30" class="big">קדימה 30 שניות</button>
+    <button id="bB5" class="big">אחורה 5 שניות</button>
+    <button id="bStart" class="big">לתחילה</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button id="bZin">הגדל גל</button><button id="bZout">הקטן גל</button>
+    <button id="bAB" class="big" style="flex:1">מעבר: מקור / מעובד</button>
+  </div>
+  <div class="small" id="abState" style="margin-top:6px">כרגע נשמע: המעובד</div>
+  <details class="grp"><summary>לולאת לימוד</summary>
+    <div class="row" style="padding-bottom:12px">
+      <button id="bLA">סמן התחלה (א)</button>
+      <button id="bLB">סמן סוף (ב)</button>
+      <button id="bLOn">לולאה כבויה</button>
+      <button id="bLClr">נקה סימונים</button>
+    </div>
+    <div class="small" id="loopInfo" style="padding-bottom:12px">עוד לא סומן קטע.</div>
+  </details>
+  <div class="small">קיצורי מקשים במחשב: רווח = נגן ועצור, חץ ימינה = אחורה 15, חץ שמאלה = קדימה 30, חץ למעלה = אחורה 5, פלוס ומינוס = מהירות.</div>
+</section>
+
+<section class="card hide" id="presetsCard">
+  <h2>ג. סגנונות קול בלחיצה אחת</h2>
+  <div class="presets" id="presets"></div>
+  <div class="row" style="margin-top:10px"><button id="bSavePreset">שמור את ההגדרות שלי כערכה</button><button id="bResetAll">אפס הכל</button></div>
+  <div id="custom" class="presets" style="margin-top:10px"></div>
+  <div class="small" id="presetNow" style="margin-top:8px"></div>
+</section>
+
+<section class="card hide" id="controls">
+  <h2>ד. כוונון</h2>
+  <div id="groups"></div>
+  <div class="msg hide" id="busy" role="status"></div>
+  <div class="small" id="savingsLbl"></div>
+  <div class="row" style="margin-top:8px"><button id="bNorm">חשב נרמול עכשיו</button><span class="small" id="normInfo"></span></div>
+</section>
+
+<section class="card hide" id="abCard">
+  <h2>ה. השוואה ובחינה</h2>
+  <div class="row"><button id="bBlind" class="primary">התחל האזנה עיוורת</button></div>
+  <div id="blind" class="hide">
+    <p>המערכת תנגן שתי גרסאות בסדר אקראי. האזן לשתיהן ובחר איזו נשמעת טוב יותר.</p>
+    <div class="row">
+      <button id="bbA" class="big">השמע גרסה א</button><button id="bbB" class="big">השמע גרסה ב</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="bpA">גרסה א טובה יותר</button><button id="bpB">גרסה ב טובה יותר</button>
+    </div>
+    <div class="msg" id="blindRes">בחר.</div>
+  </div>
+</section>
+
+<section class="card hide" id="exportCard">
+  <h2>ו. הפקה והורדה</h2>
+  <div class="tg"><label for="fmt">סוג הקובץ</label>
+    <select id="fmt"></select></div>
+  <div class="small" id="sizeEst"></div>
+  <div class="tg"><input type="checkbox" id="second"><label for="second">הפק גם גרסה שנייה בערכה אחרת</label>
+    <select id="secondPreset" class="hide"></select></div>
+  <div class="row" style="margin-top:10px"><button id="bMake" class="primary">הפק קובץ מעובד</button><button id="bCancelMake" class="warn hide">בטל</button></div>
+  <div class="prog hide" id="prog"><i></i></div>
+  <div class="small" id="progTxt"></div>
+  <div class="dl" id="dl"></div>
+  <div id="weak" class="msg hide">הקלטה ארוכה דורשת הרבה זיכרון. אם הטלפון איטי או נתקע, מומלץ להשתמש במחשב.</div>
+</section>
+
+<section class="card hide" id="aiCard">
+  <h2>ז. רגש בבינה (תצוגה בלבד)</h2>
+  <div class="small disabled-panel">כאן יופיע החיבור לשירות קול חיצוני בשלב ג. אפשר כבר עכשיו לראות איך זה ייראה.</div>
+  <div class="tg"><label for="aiEmo">רגש</label>
+    <select id="aiEmo"><option>חם</option><option>נלהב</option><option>רציני</option><option>רך</option><option>מעורר</option><option>מסכם</option></select></div>
+  <div class="sl"><div class="head"><label for="aiInt">עוצמת הרגש</label></div><input type="range" id="aiInt" min="0" max="100" value="50"></div>
+  <div class="tg"><label for="aiSeg">הקטע</label>
+    <select id="aiSeg"><option>פתיח</option><option>סיכום</option><option>הקדמה</option></select></div>
+  <button id="aiGo">הפעל</button>
+  <div class="small" style="margin-top:6px">זהו צבע קול בלבד. הקראה מסונתזת תסומן תמיד בתווית "קול מסונתז".</div>
+</section>
+
+<section class="card" id="installCard">
+  <h2>התקנה כאפליקציה</h2>
+  <p class="small" style="margin:0 0 8px">אחרי ההתקנה הסטודיו נפתח בלחיצה מהמסך הראשי ועובד גם בלי אינטרנט.</p>
+  <div class="row"><a class="btn hide" id="aDownload" download="סטודיו קול השיעור.html" href="studio.html">הורד עותק עצמאי למחשב</a></div>
+</section>
+</div>
+
+<dialog id="dlg"><form method="dialog" id="dlgForm">
+  <div id="dlgBody"></div>
+  <div class="row" style="margin-top:14px" id="dlgBtns"></div>
+</form></dialog>
+
+<script type="text/plain" id="dsp-src">/*DSP*/</script>
+<script type="text/plain" id="worklet-src">/*WORKLET*/</script>
+<script>/*LIB_WAVESURFER*/</script>
+<script>/*LIB_LAME*/</script>
+<script>
+/*APP*/
+</script>
+</body>
+</html>
