@@ -7,6 +7,16 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
 };
 
+/* ===== שחרור הקול באייפון ובאייפד: חייב לקרות בתוך המגע הראשון ===== */
+function unlockAudio() {
+  const c = A.ctx; if (!c) return;
+  if (c.state !== 'running') { try { c.resume(); } catch (e) {} }
+  if (!c._unlocked) {
+    try { const s = c.createBufferSource(); s.buffer = c.createBuffer(1, 1, c.sampleRate); s.connect(c.destination); s.start(0); c._unlocked = true; } catch (e) {}
+  }
+}
+['pointerdown', 'touchend', 'click', 'keydown'].forEach((ev) => document.addEventListener(ev, unlockAudio, { capture: true, passive: true }));
+
 /* ===== חלונות קטנים בעברית ===== */
 function dialog(bodyHtml, buttons) {
   return new Promise((res) => {
@@ -291,7 +301,8 @@ function frame() {
 /* ===== הכנה מראש ===== */
 let preTok = null, preTimer = null;
 function busy(txt) { const b = $('busy'); if (txt) { b.textContent = txt; b.classList.remove('hide'); } else b.classList.add('hide'); }
-function schedulePre() { clearTimeout(preTimer); preTimer = setTimeout(runPre, 200); }
+let preRun = Promise.resolve();
+function schedulePre() { clearTimeout(preTimer); preTimer = setTimeout(() => { preRun = runPre(); }, 200); }
 async function runPre() {
   if (!A.orig) return;
   const want = preNeeded(A.S) ? preKey(A.S) : 'identity';
@@ -309,6 +320,7 @@ async function runPre() {
     if (e.message !== 'cancel') busy('לא הצלחתי לעדכן את התצוגה. נסה הגדרות מתונות יותר או מחשב חזק יותר.');
   } finally { if (preTok === tok) preTok = null; }
 }
+function preKeyMatches() { return A.pre.key === (preNeeded(A.S) ? preKey(A.S) : 'identity'); }
 function updateSavings() {
   const s = A.pre && A.pre.saved;
   $('savingsLbl').textContent = A.S.silOn && s > 0.5 ? 'חסכת ' + durWords(s) : '';
@@ -480,7 +492,10 @@ $('bMake').onclick = async () => {
   }
   P.pause(); updatePlayBtn();
   const tok = { cancel: false }; makeTok = tok;
-  $('bMake').disabled = true; $('bCancelMake').classList.remove('hide'); $('prog').classList.remove('hide'); $('dl').innerHTML = '';
+  $('bMake').disabled = true; $('progTxt').textContent = 'ממתין לסיום ההכנה...';
+  clearTimeout(preTimer); if (preTok === null && !preKeyMatches()) await runPre(); else await preRun;
+  if (tok.cancel) { makeTok = null; $('bMake').disabled = false; return; }
+   $('bCancelMake').classList.remove('hide'); $('prog').classList.remove('hide'); $('dl').innerHTML = '';
   const setP = (f, txt) => { $('prog').firstElementChild.style.width = Math.round(f * 100) + '%'; $('progTxt').textContent = txt; };
   try {
     for (let j = 0; j < jobs.length; j++) {
