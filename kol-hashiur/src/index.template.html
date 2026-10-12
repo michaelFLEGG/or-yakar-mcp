@@ -18,6 +18,7 @@
 <body>
 <div class="wrap">
 <header class="top">
+  <a id="siteHome" class="btn hide" href="זוהר-אודיו">⌂ חזרה לספריית השיעורים</a>
   <h1>סטודיו קול השיעור</h1>
   <div class="toolbar-r">
     <button id="btnInstall" class="hide primary">התקן כאפליקציה</button>
@@ -28,7 +29,7 @@
 <p class="small" style="margin:0">כל העיבוד נעשה אצלך במכשיר. שום קובץ לא נשלח לשום מקום.</p>
 
 <section class="card" id="intake">
-  <h2>א. הקלטה</h2>
+  <h2><span class="num"></span> הקלטה</h2>
   <div class="drop" id="drop" tabindex="0" role="button" aria-label="גרור לכאן הקלטה או לחץ לבחירה">
     גרור לכאן הקלטה או לחץ לבחירה
     <small>קבצי קול ווידאו: אם-פי-3, אם-פי-4-אי, וייב, אוג, אופוס, ווב-אם, איי-איי-סי ואם-פי-4</small>
@@ -50,7 +51,7 @@
 </section>
 
 <section class="card hide" id="studio">
-  <h2>ב. גל הקול והניגון</h2>
+  <h2><span class="num"></span> גל הקול והניגון</h2>
   <div class="wavebox"><div class="cap">המקור</div><div id="waveO" class="wave"></div></div>
   <div class="wavebox"><div class="cap">המעובד</div><div id="waveP" class="wave"></div></div>
   <div class="time" id="timeLbl">0:00 / 0:00</div>
@@ -78,16 +79,45 @@
   <div class="small">קיצורי מקשים במחשב: רווח = נגן ועצור, חץ ימינה = אחורה 15, חץ שמאלה = קדימה 30, חץ למעלה = אחורה 5, פלוס ומינוס = מהירות.</div>
 </section>
 
+<section class="card hide" id="editCard">
+  <h2><span class="num"></span> חיתוך, פרקים ופתיח</h2>
+  <details class="grp" open><summary>חיתוך</summary>
+    <p class="small">סמן קטע בעזרת נקודת הניגון, והסר אותו (למשל טלפון שצלצל או ההתארגנות בתחילת השיעור). אפשר להחזיר קטע שהוסר.</p>
+    <div class="row">
+      <button id="cutA">סמן התחלת קטע</button>
+      <button id="cutB">סמן סוף קטע</button>
+      <button id="cutDo" class="warn">הסר את הקטע המסומן</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="cutHead">הסר מההתחלה עד כאן</button>
+      <button id="cutTail">הסר מכאן עד הסוף</button>
+    </div>
+    <div class="small" id="cutSel" style="margin-top:6px"></div>
+    <div id="cutList"></div>
+  </details>
+  <details class="grp"><summary>פרקים</summary>
+    <p class="small">פרקים מאפשרים לשומע לקפוץ בין חלקי השיעור. הפרקים נשמרים יחד עם ההקלטה בפרסום.</p>
+    <div class="row"><button id="chAdd" class="primary">הוסף פרק בנקודה הנוכחית</button></div>
+    <div id="chList"></div>
+  </details>
+  <details class="grp"><summary>פתיח וסיום קבועים</summary>
+    <p class="small">קובץ קול קצר שיתווסף בתחילת כל שיעור ובסופו (למשל צליל והכרזה). הקבצים נשמרים רק בדפדפן הזה.</p>
+    <div id="assets"></div>
+  </details>
+</section>
+
 <section class="card hide" id="presetsCard">
-  <h2>ג. סגנונות קול בלחיצה אחת</h2>
+  <h2><span class="num"></span> סגנונות קול בלחיצה אחת</h2>
   <div class="presets" id="presets"></div>
   <div class="row" style="margin-top:10px"><button id="bSavePreset">שמור את ההגדרות שלי כערכה</button><button id="bResetAll">אפס הכל</button></div>
+  <div class="row" style="margin-top:8px"><button id="bSetDefault">קבע את ההגדרות הנוכחיות כברירת מחדל לכל שיעור חדש</button><button id="bClearDefault" class="hide">בטל ברירת מחדל</button></div>
+  <div class="small" id="defaultNote"></div>
   <div id="custom" class="presets" style="margin-top:10px"></div>
   <div class="small" id="presetNow" style="margin-top:8px"></div>
 </section>
 
 <section class="card hide" id="controls">
-  <h2>ד. כוונון</h2>
+  <h2><span class="num"></span> כוונון</h2>
   <div id="groups"></div>
   <div class="msg hide" id="busy" role="status"></div>
   <div class="small" id="savingsLbl"></div>
@@ -95,7 +125,7 @@
 </section>
 
 <section class="card hide" id="abCard">
-  <h2>ה. השוואה ובחינה</h2>
+  <h2><span class="num"></span> השוואה ובחינה</h2>
   <div class="row"><button id="bBlind" class="primary">התחל האזנה עיוורת</button></div>
   <div id="blind" class="hide">
     <p>המערכת תנגן שתי גרסאות בסדר אקראי. האזן לשתיהן ובחר איזו נשמעת טוב יותר.</p>
@@ -110,7 +140,7 @@
 </section>
 
 <section class="card hide" id="exportCard">
-  <h2>ו. הפקה והורדה</h2>
+  <h2><span class="num"></span> הפקה והורדה</h2>
   <div class="tg"><label for="fmt">סוג הקובץ</label>
     <select id="fmt"></select></div>
   <div class="small" id="sizeEst"></div>
@@ -123,8 +153,22 @@
   <div id="weak" class="msg hide">הקלטה ארוכה דורשת הרבה זיכרון. אם הטלפון איטי או נתקע, מומלץ להשתמש במחשב.</div>
 </section>
 
+<section class="card hide" id="pubCard">
+  <h2><span class="num"></span> פרסום בספריית השיעורים</h2>
+  <p class="small">מפרסם את הקובץ המעובד ישירות לספריית השיעורים והקלטות של האתר, עם הפרטים, הפרקים ומפת השתיקות. נדרש מפתח מנהל.</p>
+  <div class="frm" id="pubForm"></div>
+  <div class="tg"><input type="checkbox" id="pubDraft"><label for="pubDraft">שמור כטיוטה (מוסתר מהציבור עד שתפרסם)</label></div>
+  <div class="tg"><label for="pubDate">תאריך פרסום (אופציונלי, בעתיד ההקלטה תופיע רק מאז)</label><input type="date" id="pubDate"></div>
+  <div class="small" id="pubVariantsLbl">גרסאות צליל נוספות לאותה הקלטה (באותו ציר זמן, השומע בוחר ביניהן):</div>
+  <div class="row" id="pubVariants"></div>
+  <div class="row" style="margin-top:10px"><button id="bPublish" class="primary">פרסם בספרייה</button><button id="bPubCancel" class="warn hide">בטל</button></div>
+  <div class="prog hide" id="pubProg"><i></i></div>
+  <div class="small" id="pubTxt"></div>
+  <div class="dl" id="pubDone"></div>
+</section>
+
 <section class="card hide" id="aiCard">
-  <h2>ז. רגש בבינה (תצוגה בלבד)</h2>
+  <h2><span class="num"></span> רגש בבינה (תצוגה בלבד)</h2>
   <div class="small disabled-panel">כאן יופיע החיבור לשירות קול חיצוני בשלב ג. אפשר כבר עכשיו לראות איך זה ייראה.</div>
   <div class="tg"><label for="aiEmo">רגש</label>
     <select id="aiEmo"><option>חם</option><option>נלהב</option><option>רציני</option><option>רך</option><option>מעורר</option><option>מסכם</option></select></div>

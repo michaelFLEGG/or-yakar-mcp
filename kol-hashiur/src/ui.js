@@ -34,7 +34,7 @@ function dialog(bodyHtml, buttons) {
     const inp = $('dlgInput'); if (inp) inp.focus();
   });
 }
-const askText = (title) => dialog('<p><b>' + title + '</b></p><input type="text" id="dlgInput" maxlength="40">', [{ text: 'שמור', value: 'input', cls: 'primary' }, { text: 'ביטול', value: null }]);
+const askText = (title, type) => dialog('<p><b>' + title + '</b></p><input type="' + (type || 'text') + '" id="dlgInput" maxlength="80">', [{ text: 'שמור', value: 'input', cls: 'primary' }, { text: 'ביטול', value: null }]);
 const askConfirm = (txt, yes) => dialog('<p>' + txt + '</p>', [{ text: yes || 'אישור', value: true, cls: 'primary' }, { text: 'ביטול', value: false }]);
 const tell = (html) => dialog(html, [{ text: 'הבנתי', value: true, cls: 'primary' }]);
 
@@ -194,13 +194,15 @@ function mkWave(container, color, peaks) {
   cur.style.cssText = 'position:absolute;top:0;bottom:0;width:3px;background:' + cssVar('--cursor') + ';pointer-events:none;z-index:5;left:0';
   const box = document.createElement('div');
   box.style.cssText = 'position:absolute;top:0;bottom:0;background:' + cssVar('--acc2') + ';opacity:.28;pointer-events:none;z-index:4;display:none';
-  wrap.appendChild(box); wrap.appendChild(cur);
+  const ovl = document.createElement('div');
+  ovl.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:3';
+  wrap.appendChild(ovl); wrap.appendChild(box); wrap.appendChild(cur);
   wrap.style.cursor = 'pointer';
   wrap.addEventListener('click', (e) => {
     const r = wrap.getBoundingClientRect();
     P.seek(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * A.orig.durationSec);
   });
-  return { ws, cur, box };
+  return { ws, cur, box, ovl };
 }
 function origScale() { let m = 0; for (let i = 0; i < origPeaks.length; i++) if (origPeaks[i] > m) m = origPeaks[i]; return m > 0 ? 0.92 / m : 1; }
 function procPeaksArr() {
@@ -239,7 +241,7 @@ function setZoom(f) {
 $('bZin').onclick = () => setZoom(1.7);
 $('bZout').onclick = () => setZoom(1 / 1.7);
 
-function drawLoop() {
+let drawLoop = function () {
   const L = P.loop, d = A.orig ? A.orig.durationSec : 0;
   [wsO, wsP].forEach((w) => {
     if (!w) return;
@@ -255,7 +257,7 @@ function drawLoop() {
   $('loopInfo').innerHTML = s;
   $('bLOn').textContent = L.on ? 'לולאה פעילה' : 'לולאה כבויה';
   $('bLOn').classList.toggle('on', L.on);
-}
+};
 $('bLA').onclick = () => { const p = P.getPos(); P.loop.a = p; if (P.loop.b <= p) P.loop.b = 0; P.loop.on = false; P.loop.count = 0; drawLoop(); };
 $('bLB').onclick = async () => { const p = P.getPos(); if (p <= P.loop.a) { await tell('סוף הקטע צריך להיות אחרי ההתחלה.'); return; } P.loop.b = p; await P.setLoop(true, P.loop.a, p); drawLoop(); };
 $('bLOn').onclick = async () => { if (!(P.loop.b > P.loop.a)) { await tell('קודם סמן התחלה (א) וסוף (ב).'); return; } await P.setLoop(!P.loop.on, P.loop.a, P.loop.b); drawLoop(); };
@@ -323,7 +325,7 @@ async function runPre() {
 function preKeyMatches() { return A.pre.key === (preNeeded(A.S) ? preKey(A.S) : 'identity'); }
 function updateSavings() {
   const s = A.pre && A.pre.saved;
-  $('savingsLbl').textContent = A.S.silOn && s > 0.5 ? 'חסכת ' + durWords(s) : '';
+  $('savingsLbl').textContent = s > 0.5 ? 'חסכת ' + durWords(s) : '';
 }
 let normTok = null;
 function scheduleNorm() { if (!A.S.normalize) return; clearTimeout(normTimer); normTimer = setTimeout(runNorm, 900); }
@@ -365,7 +367,7 @@ async function handleFile(file) {
     loadMsg(e.hebrew ? e.message : 'משהו השתבש בקריאת הקובץ. אם ההקלטה ארוכה מאוד, נסה במחשב.', 'err');
   }
 }
-function onLoaded(o, file) {
+let onLoaded = function (o, file) {
   loadMsg('');
   const mb = (o.size / 1048576).toFixed(1);
   const kbps = Math.round(o.size * 8 / o.durationSec / 1000);
@@ -383,7 +385,7 @@ function onLoaded(o, file) {
   const weak = o.durationSec > 1200 && (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || (navigator.deviceMemory && navigator.deviceMemory <= 4));
   $('weak').classList.toggle('hide', !weak);
   $('studio').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+};
 
 let rec = null;
 $('btnRec').onclick = async () => {

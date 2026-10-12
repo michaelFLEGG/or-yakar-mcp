@@ -6,8 +6,39 @@ const A = {
   pre: null,          /* { buf, chs, sr, len, nch, map, key } */
   S: Object.assign({}, DEFAULTS, { _normDb: 0 }),
   presetName: 'מותאם אישית',
-  bpmToken: null,
+  /* עריכה: חיתוכים (בשניות של המקור), פרקים, פתיח וסיום */
+  edit: { cuts: [], chapters: [], intro: false, outro: false },
+  assetVer: 0,
 };
+
+/* ===== אחסון קבצים קבועים בדפדפן: פתיח וסיום (IndexedDB) ===== */
+const idb = {
+  _db: null,
+  open() {
+    if (this._db) return this._db;
+    this._db = new Promise((res, rej) => {
+      try {
+        const rq = indexedDB.open('kol-hashiur', 1);
+        rq.onupgradeneeded = () => rq.result.createObjectStore('kv');
+        rq.onsuccess = () => res(rq.result);
+        rq.onerror = () => rej(rq.error);
+      } catch (e) { rej(e); }
+    });
+    return this._db;
+  },
+  async get(k) { try { const db = await this.open(); return await new Promise((res) => { const r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); }); } catch (e) { return null; } },
+  async set(k, v) { try { const db = await this.open(); return await new Promise((res) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(true); t.onerror = () => res(false); }); } catch (e) { return false; } },
+  async del(k) { try { const db = await this.open(); return await new Promise((res) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = () => res(true); t.onerror = () => res(false); }); } catch (e) { return false; } },
+};
+async function decodeAsset(kind) {
+  const rec = await idb.get(kind);
+  if (!rec || !rec.buf) return null;
+  try {
+    const buf = await A.ctx.decodeAudioData(rec.buf.slice(0));
+    const chs = []; for (let c = 0; c < Math.min(2, buf.numberOfChannels); c++) chs.push(buf.getChannelData(c));
+    return chs;
+  } catch (e) { return null; }
+}
 
 const fmtTime = (s) => {
   s = Math.max(0, s);
@@ -101,13 +132,13 @@ async function loadAudio(blob, name, onStatus) {
 }
 
 /* ===== הכנה מראש: זמזום, רעש, שתיקות, חד-ערוצי ===== */
-function preKey(S) { return JSON.stringify([S.nr, S.hum, S.silOn, S.silMin, S.silKeep, S.mono]); }
-function preNeeded(S) { return S.nr > 0 || S.hum || S.silOn || (S.mono && A.orig.nch > 1); }
+function preKey(S) { return JSON.stringify([S.nr, S.hum, S.silOn, S.silMin, S.silKeep, S.mono, A.edit.cuts, A.edit.intro, A.edit.outro, A.assetVer]); }
+function preNeeded(S) { return S.nr > 0 || S.hum || S.silOn || (S.mono && A.orig.nch > 1) || A.edit.cuts.length > 0 || A.edit.intro || A.edit.outro; }
 
 async function computePre(S, token, progress) {
   const o = A.orig, ctx = A.ctx;
   const key = preKey(S);
-  if (!preNeeded(S)) return { buf: o.buf, chs: o.chs, sr: o.sr, len: o.len, nch: o.nch, map: identityMap(o.len), key: 'identity', saved: 0 };
+  if (!preNeeded(S)) return { buf: o.buf, chs: o.chs, sr: o.sr, len: o.len, nch: o.nch, map: identityMap(o.len), key: 'identity', saved: 0, introLen: 0 };
   const pacer = new Pacer();
   const check = (f) => { if (token.cancel) throw new Error('cancel'); if (f !== undefined && progress) progress(f); };
   let chs;
@@ -119,18 +150,34 @@ async function computePre(S, token, progress) {
   await pacer.tick(check);
   if (S.hum) { progress && progress(0.05); await removeHum(chs, o.sr, pacer, check); }
   if (S.nr > 0) { await denoise(chs, o.sr, S.nr, pacer, (f) => check(f === undefined ? undefined : 0.1 + f * 0.8)); }
-  let map = identityMap(o.len), saved = 0;
-  if (S.silOn) {
-    progress && progress(0.92);
-    await pacer.tick(check);
-    const r = shortenSilences(chs, o.sr, S.silMin, S.silKeep, pacer);
-    chs = r.chs; map = { segs: r.segs, origLen: r.origLen };
-    saved = (o.len - chs[0].length) / o.sr;
-  }
+  progress && progress(0.92);
+  await pacer.tick(check);
+  let removals = A.edit.cuts.map((c) => [Math.round(c[0] * o.sr), Math.round(c[1] * o.sr)]);
+  if (S.silOn) removals = removals.concat(silenceRemovals(chs, o.sr, S.silMin, S.silKeep));
+  let intro = A.edit.intro ? await decodeAsset('intro') : null;
+  let outro = A.edit.outro ? await decodeAsset('outro') : null;
+  const fit = (x) => (x && chs.length === 1 && x.length === 2 ? [x[0].map((v, i) => (v + x[1][i]) * 0.5)] : x);
+  intro = fit(intro); outro = fit(outro);
+  const r = buildKept(chs, o.sr, removals, intro, outro);
+  chs = r.chs;
+  const saved = (o.len - (chs[0].length - r.introLen - r.outroLen)) / o.sr;
   const buf = ctx.createBuffer(chs.length, chs[0].length, o.sr);
   for (let c = 0; c < chs.length; c++) buf.getChannelData(c).set(chs[c]);
   const real = []; for (let c = 0; c < chs.length; c++) real.push(buf.getChannelData(c));
-  return { buf, chs: real, sr: o.sr, len: chs[0].length, nch: chs.length, map, key, saved };
+  return { buf, chs: real, sr: o.sr, len: chs[0].length, nch: chs.length, map: { segs: r.segs, origLen: r.origLen }, key, saved, introLen: r.introLen };
+}
+
+/* זמן בהקלטה המעובדת הסופית (אחרי חיתוכים, שתיקות, פתיח ומהירות) לפי זמן במקור */
+function finalTimeOf(pre, tempo, tOrig) {
+  return mapOrigToPre(pre.map, Math.round(tOrig * A.orig.sr)) / pre.sr / tempo;
+}
+/* מפת שתיקות להקלטה הסופית: מערך שטוח [התחלה, סוף, ...] בשניות */
+function silenceMapFinal(pre, tempo) {
+  const out = [];
+  for (const [a, b] of detectSilence(pre.chs, pre.sr, 0.6)) {
+    out.push(Math.round(a / pre.sr / tempo * 10) / 10, Math.round(b / pre.sr / tempo * 10) / 10);
+  }
+  return out;
 }
 
 /* ===== נגן בזמן אמת ===== */

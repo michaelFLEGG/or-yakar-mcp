@@ -10,7 +10,7 @@ fs.mkdirSync(dist, { recursive: true });
 
 const dsp = r('src/dsp.js');
 const worklet = r('src/worklet.js');
-const app = [dsp, r('src/prestage.js'), r('src/core.js'), r('src/engine.js'), r('src/ui.js')].join('\n');
+const appFor = (site) => ['const SITE_MODE = ' + (site ? 'true' : 'false') + ';', dsp, r('src/prestage.js'), r('src/core.js'), r('src/engine.js'), r('src/meta.js'), r('src/ui.js'), r('src/ui-edit.js'), r('src/publish.js'), r('src/ui-publish.js')].join('\n');
 const safe = (s) => s.replace(/<\/script/gi, '<\\/script');
 
 // סמלילים
@@ -52,15 +52,15 @@ const manifest = (inline) => JSON.stringify({
   ],
 }, null, 2);
 
-function assemble(headLinks, hasStudio) {
+function assemble(headLinks, hasStudio, site) {
   let h = r('src/index.template.html');
   const rep = (k, v) => { h = h.split(k).join('\u0000'); h = h.replace('\u0000', () => v); h = h.split('\u0000').join(''); };
-  rep('/*CSS*/', r('src/style.css'));
+  rep('/*CSS*/', r('src/style.css') + (site ? '\n' + r('src/site.css') : ''));
   rep('/*DSP*/', safe(dsp));
   rep('/*WORKLET*/', safe(worklet));
   rep('/*LIB_WAVESURFER*/', safe(r('vendor/wavesurfer.min.js')));
   rep('/*LIB_LAME*/', safe(r('vendor/lame.min.js')));
-  rep('/*APP*/', safe(app));
+  rep('/*APP*/', safe(appFor(site)));
   rep('<!--HEAD_LINKS-->', headLinks);
   if (!hasStudio) h = h.replace('<body>', '<body data-has-studio="0">');
   return h;
@@ -68,14 +68,14 @@ function assemble(headLinks, hasStudio) {
 const b64 = (f) => 'data:image/png;base64,' + fs.readFileSync(path.join(dist, f)).toString('base64');
 
 // האתר המותקן
-const siteHead = [
+const installHead = [
   '<link rel="manifest" href="manifest.webmanifest">',
   '<link rel="icon" type="image/svg+xml" href="icon.svg">',
   '<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">',
   '<link rel="apple-touch-icon" href="apple-touch-icon.png">',
 ].join('\n');
-const site = assemble(siteHead, true);
-fs.writeFileSync(path.join(dist, 'index.html'), site);
+const siteApp = assemble(installHead, true, false);
+fs.writeFileSync(path.join(dist, 'index.html'), siteApp);
 fs.writeFileSync(path.join(dist, 'manifest.webmanifest'), manifest(null));
 
 // הקובץ העצמאי: הכל בפנים
@@ -86,9 +86,23 @@ const aloneHead = [
   `<link rel="icon" type="image/png" href="${b64('favicon-32.png')}">`,
   `<link rel="apple-touch-icon" href="${b64('apple-touch-icon.png')}">`,
 ].join('\n');
-const alone = assemble(aloneHead, false);
+const alone = assemble(aloneHead, false, false);
 fs.writeFileSync(path.join(dist, 'studio.html'), alone);
 fs.writeFileSync(path.join(dist, 'סטודיו קול השיעור.html'), alone);
+
+// גרסת האתר (ממלכת הזוהר): דף אחד שנטמע באתר, עם פרסום לספרייה
+const siteHead = [
+  '<meta name="robots" content="noindex">',
+  '<!-- PWA-BEGIN: הוזרק ב-pwa_inject.py, כמו בשאר דפי האתר -->',
+  '<link rel="manifest" href="/manifest.webmanifest">',
+  '<meta name="theme-color" content="#9a7620">',
+  '<link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png">',
+  '<script src="/pwa.js" defer></script>',
+  '<!-- PWA-END -->',
+  '<link rel="stylesheet" href="site-fonts.css">',
+].join('\n');
+fs.mkdirSync(path.join(dist, 'site'), { recursive: true });
+fs.writeFileSync(path.join(dist, 'site', 'זוהר-סטודיו.html'), assemble(siteHead, false, true).replace('<title>סטודיו קול השיעור</title>', '<title>סטודיו קול השיעור · ממלכת הזוהר</title>'));
 
 // עובד שירות לעבודה בלי אינטרנט
 const version = Date.now().toString(36);

@@ -146,9 +146,10 @@ async function denoise(chs, sr, strength, pacer, cb) {
   }
 }
 
-/* קיצור שתיקות. מחזיר ערוצים חדשים ומפת זמנים */
-function shortenSilences(chs, sr, minSil, keep, pacer) {
+/* זיהוי שתיקות: מחזיר רשימת טווחים [התחלה, סוף) בדגימות. סף אוטומטי לפי רצפת הרעש. */
+function detectSilence(chs, sr, minSec) {
   const len = chs[0].length, fr = Math.round(sr * 0.01), nf = Math.floor(len / fr);
+  if (nf < 10) return [];
   const db = new Float32Array(nf);
   for (let f = 0; f < nf; f++) {
     let s = 0;
@@ -158,36 +159,73 @@ function shortenSilences(chs, sr, minSil, keep, pacer) {
   const sorted = Float32Array.from(db).sort();
   const lo = sorted[Math.floor(nf * 0.05)], hi = sorted[Math.floor(nf * 0.95)];
   const thr = lo + 0.35 * (hi - lo);
-  const minFr = Math.max(1, Math.round(minSil * 100)), keepFr = Math.round(keep * 100);
-  const segs = [];
-  let f = 0, outPos = 0;
-  const addSeg = (a, b) => { if (b > a) { segs.push({ o0: a, o1: b, p0: outPos }); outPos += b - a; } };
-  let spanStart = 0;
+  const minFr = Math.max(1, Math.round(minSec * 100));
+  const out = [];
+  let f = 0;
   while (f < nf) {
     if (db[f] < thr) {
       let e = f;
       while (e < nf && db[e] < thr) e++;
-      if (e - f >= minFr && e - f > keepFr) {
-        const headKeep = Math.floor(keepFr / 2), tailKeep = keepFr - headKeep;
-        addSeg(spanStart * fr, (f + headKeep) * fr);
-        spanStart = e - tailKeep;
-      }
+      if (e - f >= minFr) out.push([f * fr, e * fr]);
       f = e;
     } else f++;
   }
-  addSeg(spanStart * fr, len);
-  const total = outPos;
-  const out = chs.map(() => new Float32Array(total));
-  const fade = Math.min(Math.round(sr * 0.008), fr);
-  for (let c = 0; c < chs.length; c++) {
-    for (let s = 0; s < segs.length; s++) {
-      const sg = segs[s];
-      out[c].set(chs[c].subarray(sg.o0, sg.o1), sg.p0);
-      if (s > 0) for (let i = 0; i < fade && i < sg.o1 - sg.o0; i++) out[c][sg.p0 + i] *= i / fade;
-      if (s < segs.length - 1) for (let i = 0; i < fade && i < sg.o1 - sg.o0; i++) out[c][sg.p0 + (sg.o1 - sg.o0) - 1 - i] *= i / fade;
-    }
+  return out;
+}
+
+/* טווחי ההסרה לקיצור שתיקות: משאירים keep שניות מכל שתיקה ארוכה (חצי בתחילתה וחצי בסופה) */
+function silenceRemovals(chs, sr, minSec, keepSec) {
+  const keep = Math.round(keepSec * sr), out = [];
+  for (const [a, b] of detectSilence(chs, sr, minSec)) {
+    if (b - a <= keep) continue;
+    const head = Math.floor(keep / 2), tail = keep - head;
+    out.push([a + head, b - tail]);
   }
-  return { chs: out, segs, origLen: len };
+  return out;
+}
+
+/* איחוד טווחים חופפים וסידורם */
+function mergeRanges(r) {
+  r = r.filter((x) => x[1] > x[0]).sort((a, b) => a[0] - b[0]);
+  const out = [];
+  for (const x of r) {
+    if (out.length && x[0] <= out[out.length - 1][1]) out[out.length - 1][1] = Math.max(out[out.length - 1][1], x[1]);
+    else out.push([x[0], x[1]]);
+  }
+  return out;
+}
+
+/* בונה את ההקלטה המחוברת: מוריד את טווחי ההסרה, ומוסיף פתיח וסיום אם יש.
+   מחזיר ערוצים חדשים ומפת זמנים (segs) מהמקור אל המעובד. */
+function buildKept(chs, sr, removals, intro, outro) {
+  const len = chs[0].length;
+  const rem = mergeRanges(removals);
+  const keeps = [];
+  let pos = 0;
+  for (const [a, b] of rem) { if (a > pos) keeps.push([pos, a]); pos = Math.max(pos, b); }
+  if (pos < len) keeps.push([pos, len]);
+  if (!keeps.length) keeps.push([0, Math.min(len, 1)]);
+  const introLen = intro ? intro[0].length : 0, outroLen = outro ? outro[0].length : 0;
+  let bodyLen = 0; for (const k of keeps) bodyLen += k[1] - k[0];
+  const total = introLen + bodyLen + outroLen;
+  const out = chs.map(() => new Float32Array(total));
+  const fade = Math.round(sr * 0.008);
+  const segs = [];
+  let p = introLen;
+  keeps.forEach((k, idx) => {
+    segs.push({ o0: k[0], o1: k[1], p0: p });
+    for (let c = 0; c < chs.length; c++) {
+      out[c].set(chs[c].subarray(k[0], k[1]), p);
+      if (idx > 0) for (let i = 0; i < fade && i < k[1] - k[0]; i++) out[c][p + i] *= i / fade;
+      if (idx < keeps.length - 1) for (let i = 0; i < fade && i < k[1] - k[0]; i++) out[c][p + (k[1] - k[0]) - 1 - i] *= i / fade;
+    }
+    p += k[1] - k[0];
+  });
+  for (let c = 0; c < chs.length; c++) {
+    if (intro) out[c].set(intro[Math.min(c, intro.length - 1)], 0);
+    if (outro) out[c].set(outro[Math.min(c, outro.length - 1)], introLen + bodyLen);
+  }
+  return { chs: out, segs, origLen: len, introLen, outroLen };
 }
 
 function identityMap(len) { return { segs: [{ o0: 0, o1: len, p0: 0 }], origLen: len }; }

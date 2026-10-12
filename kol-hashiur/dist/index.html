@@ -97,6 +97,7 @@ ol.heb li b{display:inline-block;min-width:1.6em}
 <body>
 <div class="wrap">
 <header class="top">
+  <a id="siteHome" class="btn hide" href="זוהר-אודיו">⌂ חזרה לספריית השיעורים</a>
   <h1>סטודיו קול השיעור</h1>
   <div class="toolbar-r">
     <button id="btnInstall" class="hide primary">התקן כאפליקציה</button>
@@ -107,7 +108,7 @@ ol.heb li b{display:inline-block;min-width:1.6em}
 <p class="small" style="margin:0">כל העיבוד נעשה אצלך במכשיר. שום קובץ לא נשלח לשום מקום.</p>
 
 <section class="card" id="intake">
-  <h2>א. הקלטה</h2>
+  <h2><span class="num"></span> הקלטה</h2>
   <div class="drop" id="drop" tabindex="0" role="button" aria-label="גרור לכאן הקלטה או לחץ לבחירה">
     גרור לכאן הקלטה או לחץ לבחירה
     <small>קבצי קול ווידאו: אם-פי-3, אם-פי-4-אי, וייב, אוג, אופוס, ווב-אם, איי-איי-סי ואם-פי-4</small>
@@ -129,7 +130,7 @@ ol.heb li b{display:inline-block;min-width:1.6em}
 </section>
 
 <section class="card hide" id="studio">
-  <h2>ב. גל הקול והניגון</h2>
+  <h2><span class="num"></span> גל הקול והניגון</h2>
   <div class="wavebox"><div class="cap">המקור</div><div id="waveO" class="wave"></div></div>
   <div class="wavebox"><div class="cap">המעובד</div><div id="waveP" class="wave"></div></div>
   <div class="time" id="timeLbl">0:00 / 0:00</div>
@@ -157,16 +158,45 @@ ol.heb li b{display:inline-block;min-width:1.6em}
   <div class="small">קיצורי מקשים במחשב: רווח = נגן ועצור, חץ ימינה = אחורה 15, חץ שמאלה = קדימה 30, חץ למעלה = אחורה 5, פלוס ומינוס = מהירות.</div>
 </section>
 
+<section class="card hide" id="editCard">
+  <h2><span class="num"></span> חיתוך, פרקים ופתיח</h2>
+  <details class="grp" open><summary>חיתוך</summary>
+    <p class="small">סמן קטע בעזרת נקודת הניגון, והסר אותו (למשל טלפון שצלצל או ההתארגנות בתחילת השיעור). אפשר להחזיר קטע שהוסר.</p>
+    <div class="row">
+      <button id="cutA">סמן התחלת קטע</button>
+      <button id="cutB">סמן סוף קטע</button>
+      <button id="cutDo" class="warn">הסר את הקטע המסומן</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="cutHead">הסר מההתחלה עד כאן</button>
+      <button id="cutTail">הסר מכאן עד הסוף</button>
+    </div>
+    <div class="small" id="cutSel" style="margin-top:6px"></div>
+    <div id="cutList"></div>
+  </details>
+  <details class="grp"><summary>פרקים</summary>
+    <p class="small">פרקים מאפשרים לשומע לקפוץ בין חלקי השיעור. הפרקים נשמרים יחד עם ההקלטה בפרסום.</p>
+    <div class="row"><button id="chAdd" class="primary">הוסף פרק בנקודה הנוכחית</button></div>
+    <div id="chList"></div>
+  </details>
+  <details class="grp"><summary>פתיח וסיום קבועים</summary>
+    <p class="small">קובץ קול קצר שיתווסף בתחילת כל שיעור ובסופו (למשל צליל והכרזה). הקבצים נשמרים רק בדפדפן הזה.</p>
+    <div id="assets"></div>
+  </details>
+</section>
+
 <section class="card hide" id="presetsCard">
-  <h2>ג. סגנונות קול בלחיצה אחת</h2>
+  <h2><span class="num"></span> סגנונות קול בלחיצה אחת</h2>
   <div class="presets" id="presets"></div>
   <div class="row" style="margin-top:10px"><button id="bSavePreset">שמור את ההגדרות שלי כערכה</button><button id="bResetAll">אפס הכל</button></div>
+  <div class="row" style="margin-top:8px"><button id="bSetDefault">קבע את ההגדרות הנוכחיות כברירת מחדל לכל שיעור חדש</button><button id="bClearDefault" class="hide">בטל ברירת מחדל</button></div>
+  <div class="small" id="defaultNote"></div>
   <div id="custom" class="presets" style="margin-top:10px"></div>
   <div class="small" id="presetNow" style="margin-top:8px"></div>
 </section>
 
 <section class="card hide" id="controls">
-  <h2>ד. כוונון</h2>
+  <h2><span class="num"></span> כוונון</h2>
   <div id="groups"></div>
   <div class="msg hide" id="busy" role="status"></div>
   <div class="small" id="savingsLbl"></div>
@@ -174,7 +204,7 @@ ol.heb li b{display:inline-block;min-width:1.6em}
 </section>
 
 <section class="card hide" id="abCard">
-  <h2>ה. השוואה ובחינה</h2>
+  <h2><span class="num"></span> השוואה ובחינה</h2>
   <div class="row"><button id="bBlind" class="primary">התחל האזנה עיוורת</button></div>
   <div id="blind" class="hide">
     <p>המערכת תנגן שתי גרסאות בסדר אקראי. האזן לשתיהן ובחר איזו נשמעת טוב יותר.</p>
@@ -189,7 +219,7 @@ ol.heb li b{display:inline-block;min-width:1.6em}
 </section>
 
 <section class="card hide" id="exportCard">
-  <h2>ו. הפקה והורדה</h2>
+  <h2><span class="num"></span> הפקה והורדה</h2>
   <div class="tg"><label for="fmt">סוג הקובץ</label>
     <select id="fmt"></select></div>
   <div class="small" id="sizeEst"></div>
@@ -202,8 +232,22 @@ ol.heb li b{display:inline-block;min-width:1.6em}
   <div id="weak" class="msg hide">הקלטה ארוכה דורשת הרבה זיכרון. אם הטלפון איטי או נתקע, מומלץ להשתמש במחשב.</div>
 </section>
 
+<section class="card hide" id="pubCard">
+  <h2><span class="num"></span> פרסום בספריית השיעורים</h2>
+  <p class="small">מפרסם את הקובץ המעובד ישירות לספריית השיעורים והקלטות של האתר, עם הפרטים, הפרקים ומפת השתיקות. נדרש מפתח מנהל.</p>
+  <div class="frm" id="pubForm"></div>
+  <div class="tg"><input type="checkbox" id="pubDraft"><label for="pubDraft">שמור כטיוטה (מוסתר מהציבור עד שתפרסם)</label></div>
+  <div class="tg"><label for="pubDate">תאריך פרסום (אופציונלי, בעתיד ההקלטה תופיע רק מאז)</label><input type="date" id="pubDate"></div>
+  <div class="small" id="pubVariantsLbl">גרסאות צליל נוספות לאותה הקלטה (באותו ציר זמן, השומע בוחר ביניהן):</div>
+  <div class="row" id="pubVariants"></div>
+  <div class="row" style="margin-top:10px"><button id="bPublish" class="primary">פרסם בספרייה</button><button id="bPubCancel" class="warn hide">בטל</button></div>
+  <div class="prog hide" id="pubProg"><i></i></div>
+  <div class="small" id="pubTxt"></div>
+  <div class="dl" id="pubDone"></div>
+</section>
+
 <section class="card hide" id="aiCard">
-  <h2>ז. רגש בבינה (תצוגה בלבד)</h2>
+  <h2><span class="num"></span> רגש בבינה (תצוגה בלבד)</h2>
   <div class="small disabled-panel">כאן יופיע החיבור לשירות קול חיצוני בשלב ג. אפשר כבר עכשיו לראות איך זה ייראה.</div>
   <div class="tg"><label for="aiEmo">רגש</label>
     <select id="aiEmo"><option>חם</option><option>נלהב</option><option>רציני</option><option>רך</option><option>מעורר</option><option>מסכם</option></select></div>
@@ -788,6 +832,7 @@ u.setModules(B,G,f,b,v,a,m,z,g);G.setModules(B,g,m,a);z.setModules(G,m);f.setMod
 a.length>D&&(D=a.length,p=0|1.25*D+7200,r=new Int8Array(p));a=u.lame_encode_buffer(q,a,b,a.length,r,0,p);return new Int8Array(r.subarray(0,a))};this.flush=function(){var a=u.lame_encode_flush(q,r,0,p);return new Int8Array(r.subarray(0,a))}};lamejs.WavHeader=Fa}lamejs();
 </script>
 <script>
+const SITE_MODE = false;
 /* ליבת עיבוד הקול. הקובץ הזה רץ גם בתוך עובד השמע (תצוגה מקדימה בזמן אמת)
    וגם בדף הראשי (הפקה לקובץ), כך שהצליל זהה בשניהם. */
 
@@ -1160,9 +1205,10 @@ async function denoise(chs, sr, strength, pacer, cb) {
   }
 }
 
-/* קיצור שתיקות. מחזיר ערוצים חדשים ומפת זמנים */
-function shortenSilences(chs, sr, minSil, keep, pacer) {
+/* זיהוי שתיקות: מחזיר רשימת טווחים [התחלה, סוף) בדגימות. סף אוטומטי לפי רצפת הרעש. */
+function detectSilence(chs, sr, minSec) {
   const len = chs[0].length, fr = Math.round(sr * 0.01), nf = Math.floor(len / fr);
+  if (nf < 10) return [];
   const db = new Float32Array(nf);
   for (let f = 0; f < nf; f++) {
     let s = 0;
@@ -1172,36 +1218,73 @@ function shortenSilences(chs, sr, minSil, keep, pacer) {
   const sorted = Float32Array.from(db).sort();
   const lo = sorted[Math.floor(nf * 0.05)], hi = sorted[Math.floor(nf * 0.95)];
   const thr = lo + 0.35 * (hi - lo);
-  const minFr = Math.max(1, Math.round(minSil * 100)), keepFr = Math.round(keep * 100);
-  const segs = [];
-  let f = 0, outPos = 0;
-  const addSeg = (a, b) => { if (b > a) { segs.push({ o0: a, o1: b, p0: outPos }); outPos += b - a; } };
-  let spanStart = 0;
+  const minFr = Math.max(1, Math.round(minSec * 100));
+  const out = [];
+  let f = 0;
   while (f < nf) {
     if (db[f] < thr) {
       let e = f;
       while (e < nf && db[e] < thr) e++;
-      if (e - f >= minFr && e - f > keepFr) {
-        const headKeep = Math.floor(keepFr / 2), tailKeep = keepFr - headKeep;
-        addSeg(spanStart * fr, (f + headKeep) * fr);
-        spanStart = e - tailKeep;
-      }
+      if (e - f >= minFr) out.push([f * fr, e * fr]);
       f = e;
     } else f++;
   }
-  addSeg(spanStart * fr, len);
-  const total = outPos;
-  const out = chs.map(() => new Float32Array(total));
-  const fade = Math.min(Math.round(sr * 0.008), fr);
-  for (let c = 0; c < chs.length; c++) {
-    for (let s = 0; s < segs.length; s++) {
-      const sg = segs[s];
-      out[c].set(chs[c].subarray(sg.o0, sg.o1), sg.p0);
-      if (s > 0) for (let i = 0; i < fade && i < sg.o1 - sg.o0; i++) out[c][sg.p0 + i] *= i / fade;
-      if (s < segs.length - 1) for (let i = 0; i < fade && i < sg.o1 - sg.o0; i++) out[c][sg.p0 + (sg.o1 - sg.o0) - 1 - i] *= i / fade;
-    }
+  return out;
+}
+
+/* טווחי ההסרה לקיצור שתיקות: משאירים keep שניות מכל שתיקה ארוכה (חצי בתחילתה וחצי בסופה) */
+function silenceRemovals(chs, sr, minSec, keepSec) {
+  const keep = Math.round(keepSec * sr), out = [];
+  for (const [a, b] of detectSilence(chs, sr, minSec)) {
+    if (b - a <= keep) continue;
+    const head = Math.floor(keep / 2), tail = keep - head;
+    out.push([a + head, b - tail]);
   }
-  return { chs: out, segs, origLen: len };
+  return out;
+}
+
+/* איחוד טווחים חופפים וסידורם */
+function mergeRanges(r) {
+  r = r.filter((x) => x[1] > x[0]).sort((a, b) => a[0] - b[0]);
+  const out = [];
+  for (const x of r) {
+    if (out.length && x[0] <= out[out.length - 1][1]) out[out.length - 1][1] = Math.max(out[out.length - 1][1], x[1]);
+    else out.push([x[0], x[1]]);
+  }
+  return out;
+}
+
+/* בונה את ההקלטה המחוברת: מוריד את טווחי ההסרה, ומוסיף פתיח וסיום אם יש.
+   מחזיר ערוצים חדשים ומפת זמנים (segs) מהמקור אל המעובד. */
+function buildKept(chs, sr, removals, intro, outro) {
+  const len = chs[0].length;
+  const rem = mergeRanges(removals);
+  const keeps = [];
+  let pos = 0;
+  for (const [a, b] of rem) { if (a > pos) keeps.push([pos, a]); pos = Math.max(pos, b); }
+  if (pos < len) keeps.push([pos, len]);
+  if (!keeps.length) keeps.push([0, Math.min(len, 1)]);
+  const introLen = intro ? intro[0].length : 0, outroLen = outro ? outro[0].length : 0;
+  let bodyLen = 0; for (const k of keeps) bodyLen += k[1] - k[0];
+  const total = introLen + bodyLen + outroLen;
+  const out = chs.map(() => new Float32Array(total));
+  const fade = Math.round(sr * 0.008);
+  const segs = [];
+  let p = introLen;
+  keeps.forEach((k, idx) => {
+    segs.push({ o0: k[0], o1: k[1], p0: p });
+    for (let c = 0; c < chs.length; c++) {
+      out[c].set(chs[c].subarray(k[0], k[1]), p);
+      if (idx > 0) for (let i = 0; i < fade && i < k[1] - k[0]; i++) out[c][p + i] *= i / fade;
+      if (idx < keeps.length - 1) for (let i = 0; i < fade && i < k[1] - k[0]; i++) out[c][p + (k[1] - k[0]) - 1 - i] *= i / fade;
+    }
+    p += k[1] - k[0];
+  });
+  for (let c = 0; c < chs.length; c++) {
+    if (intro) out[c].set(intro[Math.min(c, intro.length - 1)], 0);
+    if (outro) out[c].set(outro[Math.min(c, outro.length - 1)], introLen + bodyLen);
+  }
+  return { chs: out, segs, origLen: len, introLen, outroLen };
 }
 
 function identityMap(len) { return { segs: [{ o0: 0, o1: len, p0: 0 }], origLen: len }; }
@@ -1437,8 +1520,39 @@ const A = {
   pre: null,          /* { buf, chs, sr, len, nch, map, key } */
   S: Object.assign({}, DEFAULTS, { _normDb: 0 }),
   presetName: 'מותאם אישית',
-  bpmToken: null,
+  /* עריכה: חיתוכים (בשניות של המקור), פרקים, פתיח וסיום */
+  edit: { cuts: [], chapters: [], intro: false, outro: false },
+  assetVer: 0,
 };
+
+/* ===== אחסון קבצים קבועים בדפדפן: פתיח וסיום (IndexedDB) ===== */
+const idb = {
+  _db: null,
+  open() {
+    if (this._db) return this._db;
+    this._db = new Promise((res, rej) => {
+      try {
+        const rq = indexedDB.open('kol-hashiur', 1);
+        rq.onupgradeneeded = () => rq.result.createObjectStore('kv');
+        rq.onsuccess = () => res(rq.result);
+        rq.onerror = () => rej(rq.error);
+      } catch (e) { rej(e); }
+    });
+    return this._db;
+  },
+  async get(k) { try { const db = await this.open(); return await new Promise((res) => { const r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); }); } catch (e) { return null; } },
+  async set(k, v) { try { const db = await this.open(); return await new Promise((res) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(true); t.onerror = () => res(false); }); } catch (e) { return false; } },
+  async del(k) { try { const db = await this.open(); return await new Promise((res) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = () => res(true); t.onerror = () => res(false); }); } catch (e) { return false; } },
+};
+async function decodeAsset(kind) {
+  const rec = await idb.get(kind);
+  if (!rec || !rec.buf) return null;
+  try {
+    const buf = await A.ctx.decodeAudioData(rec.buf.slice(0));
+    const chs = []; for (let c = 0; c < Math.min(2, buf.numberOfChannels); c++) chs.push(buf.getChannelData(c));
+    return chs;
+  } catch (e) { return null; }
+}
 
 const fmtTime = (s) => {
   s = Math.max(0, s);
@@ -1532,13 +1646,13 @@ async function loadAudio(blob, name, onStatus) {
 }
 
 /* ===== הכנה מראש: זמזום, רעש, שתיקות, חד-ערוצי ===== */
-function preKey(S) { return JSON.stringify([S.nr, S.hum, S.silOn, S.silMin, S.silKeep, S.mono]); }
-function preNeeded(S) { return S.nr > 0 || S.hum || S.silOn || (S.mono && A.orig.nch > 1); }
+function preKey(S) { return JSON.stringify([S.nr, S.hum, S.silOn, S.silMin, S.silKeep, S.mono, A.edit.cuts, A.edit.intro, A.edit.outro, A.assetVer]); }
+function preNeeded(S) { return S.nr > 0 || S.hum || S.silOn || (S.mono && A.orig.nch > 1) || A.edit.cuts.length > 0 || A.edit.intro || A.edit.outro; }
 
 async function computePre(S, token, progress) {
   const o = A.orig, ctx = A.ctx;
   const key = preKey(S);
-  if (!preNeeded(S)) return { buf: o.buf, chs: o.chs, sr: o.sr, len: o.len, nch: o.nch, map: identityMap(o.len), key: 'identity', saved: 0 };
+  if (!preNeeded(S)) return { buf: o.buf, chs: o.chs, sr: o.sr, len: o.len, nch: o.nch, map: identityMap(o.len), key: 'identity', saved: 0, introLen: 0 };
   const pacer = new Pacer();
   const check = (f) => { if (token.cancel) throw new Error('cancel'); if (f !== undefined && progress) progress(f); };
   let chs;
@@ -1550,18 +1664,34 @@ async function computePre(S, token, progress) {
   await pacer.tick(check);
   if (S.hum) { progress && progress(0.05); await removeHum(chs, o.sr, pacer, check); }
   if (S.nr > 0) { await denoise(chs, o.sr, S.nr, pacer, (f) => check(f === undefined ? undefined : 0.1 + f * 0.8)); }
-  let map = identityMap(o.len), saved = 0;
-  if (S.silOn) {
-    progress && progress(0.92);
-    await pacer.tick(check);
-    const r = shortenSilences(chs, o.sr, S.silMin, S.silKeep, pacer);
-    chs = r.chs; map = { segs: r.segs, origLen: r.origLen };
-    saved = (o.len - chs[0].length) / o.sr;
-  }
+  progress && progress(0.92);
+  await pacer.tick(check);
+  let removals = A.edit.cuts.map((c) => [Math.round(c[0] * o.sr), Math.round(c[1] * o.sr)]);
+  if (S.silOn) removals = removals.concat(silenceRemovals(chs, o.sr, S.silMin, S.silKeep));
+  let intro = A.edit.intro ? await decodeAsset('intro') : null;
+  let outro = A.edit.outro ? await decodeAsset('outro') : null;
+  const fit = (x) => (x && chs.length === 1 && x.length === 2 ? [x[0].map((v, i) => (v + x[1][i]) * 0.5)] : x);
+  intro = fit(intro); outro = fit(outro);
+  const r = buildKept(chs, o.sr, removals, intro, outro);
+  chs = r.chs;
+  const saved = (o.len - (chs[0].length - r.introLen - r.outroLen)) / o.sr;
   const buf = ctx.createBuffer(chs.length, chs[0].length, o.sr);
   for (let c = 0; c < chs.length; c++) buf.getChannelData(c).set(chs[c]);
   const real = []; for (let c = 0; c < chs.length; c++) real.push(buf.getChannelData(c));
-  return { buf, chs: real, sr: o.sr, len: chs[0].length, nch: chs.length, map, key, saved };
+  return { buf, chs: real, sr: o.sr, len: chs[0].length, nch: chs.length, map: { segs: r.segs, origLen: r.origLen }, key, saved, introLen: r.introLen };
+}
+
+/* זמן בהקלטה המעובדת הסופית (אחרי חיתוכים, שתיקות, פתיח ומהירות) לפי זמן במקור */
+function finalTimeOf(pre, tempo, tOrig) {
+  return mapOrigToPre(pre.map, Math.round(tOrig * A.orig.sr)) / pre.sr / tempo;
+}
+/* מפת שתיקות להקלטה הסופית: מערך שטוח [התחלה, סוף, ...] בשניות */
+function silenceMapFinal(pre, tempo) {
+  const out = [];
+  for (const [a, b] of detectSilence(pre.chs, pre.sr, 0.6)) {
+    out.push(Math.round(a / pre.sr / tempo * 10) / 10, Math.round(b / pre.sr / tempo * 10) / 10);
+  }
+  return out;
 }
 
 /* ===== נגן בזמן אמת ===== */
@@ -1998,6 +2128,38 @@ async function produce(S, fmt, token, onProg, pre) {
   return enc.finish();
 }
 
+/* רשימות הערכים של ספריית האודיו באתר (זהות ל-זוהר-אודיו.html) */
+const READ_TYPES = ['קריאה רגילה','קריאה איטית','קריאה מהירה','קריאה ליטאית','קריאה ספרדית','קריאה חסידית','קריאה עם פירוש','שיעור מלא'];
+const TRADS = ['ספרדי','ליטאי','חסידי','תימני','אחר'];
+const QUALITIES = ['אולפן','גבוהה','רגילה','שטח'];
+const LANGS = ['ארמית (לשון הזוהר)','עברית (תרגום)','ארמית + עברית','אידיש','אחר'];
+const BOOKS = {
+  'בראשית': ['Bereshit','Noach','Lech_Lecha','Vayera','Chayei_Sara','Toldot','Vayetzei','Vayishlach','Vayeshev','Miketz','Vayigash','Vayechi'],
+  'שמות': ['Shemot','Vaera','Bo','Beshalach','Yitro','Mishpatim','Terumah','Tetzaveh','Ki_Tisa','Vayakhel','Pekudei'],
+  'ויקרא': ['Vayikra','Tzav','Shmini','Tazria','Metzora','Achrei_Mot','Kedoshim','Emor','Behar','Bechukotai'],
+  'במדבר': ['Bamidbar','Nasso',"Beha'alotcha","Sh'lach",'Korach','Chukat','Balak','Pinchas','Matot'],
+  'דברים': ['Vaetchanan','Eikev','Shoftim','Ki_Teitzei','Vayeilech',"Ha'Azinu"],
+  'אדרות וספרים נסתרים': ['Introduction','Sifra_DiTzniuta','Idra_Rabba','Idra_Zuta','Tikkunei_Zohar','Zohar_Chadash','Sefer_Yetzirah','Sefer_Yetzirah_Gra_Version','Sefer_HaBahir','Addenda_Volume_I','Addenda_Volume_II','Addenda_Volume_III']
+};
+const PNAMES = {
+  Bereshit:'בראשית', Noach:'נח', Lech_Lecha:'לך לך', Vayera:'וירא', Chayei_Sara:'חיי שרה', Toldot:'תולדות',
+  Vayetzei:'ויצא', Vayishlach:'וישלח', Vayeshev:'וישב', Miketz:'מקץ', Vayigash:'ויגש', Vayechi:'ויחי',
+  Shemot:'שמות', Vaera:'וארא', Bo:'בא', Beshalach:'בשלח', Yitro:'יתרו', Mishpatim:'משפטים',
+  Terumah:'תרומה', Tetzaveh:'תצוה', Ki_Tisa:'כי תשא', Vayakhel:'ויקהל', Pekudei:'פקודי',
+  Vayikra:'ויקרא', Tzav:'צו', Shmini:'שמיני', Tazria:'תזריע', Metzora:'מצורע', Achrei_Mot:'אחרי מות',
+  Kedoshim:'קדושים', Emor:'אמור', Behar:'בהר', Bechukotai:'בחקתי',
+  Bamidbar:'במדבר', Nasso:'נשא', "Beha'alotcha":'בהעלותך', "Sh'lach":'שלח לך', Korach:'קרח',
+  Chukat:'חקת', Balak:'בלק', Pinchas:'פינחס', Matot:'מטות',
+  Vaetchanan:'ואתחנן', Eikev:'עקב', Shoftim:'שופטים', Ki_Teitzei:'כי תצא', Vayeilech:'וילך', "Ha'Azinu":'האזינו',
+  Introduction:'הקדמת הזוהר', Sifra_DiTzniuta:'ספרא דצניעותא', Idra_Rabba:'אדרא רבא', Idra_Zuta:'אדרא זוטא',
+  Tikkunei_Zohar:'תיקוני הזוהר', Zohar_Chadash:'זוהר חדש', Sefer_Yetzirah:'ספר יצירה',
+  Sefer_Yetzirah_Gra_Version:'ספר יצירה (גירסת הגר"א)', Sefer_HaBahir:'ספר הבהיר',
+  Addenda_Volume_I:'השמטות כרך א', Addenda_Volume_II:'השמטות כרך ב', Addenda_Volume_III:'השמטות כרך ג'
+};
+
+
+function bookOf(pkey) { for (const b in BOOKS) if (BOOKS[b].indexOf(pkey) >= 0) return b; return ''; }
+
 /* ממשק המשתמש */
 const $ = (id) => document.getElementById(id);
 const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -2006,6 +2168,16 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
 };
+
+/* ===== שחרור הקול באייפון ובאייפד: חייב לקרות בתוך המגע הראשון ===== */
+function unlockAudio() {
+  const c = A.ctx; if (!c) return;
+  if (c.state !== 'running') { try { c.resume(); } catch (e) {} }
+  if (!c._unlocked) {
+    try { const s = c.createBufferSource(); s.buffer = c.createBuffer(1, 1, c.sampleRate); s.connect(c.destination); s.start(0); c._unlocked = true; } catch (e) {}
+  }
+}
+['pointerdown', 'touchend', 'click', 'keydown'].forEach((ev) => document.addEventListener(ev, unlockAudio, { capture: true, passive: true }));
 
 /* ===== חלונות קטנים בעברית ===== */
 function dialog(bodyHtml, buttons) {
@@ -2024,7 +2196,7 @@ function dialog(bodyHtml, buttons) {
     const inp = $('dlgInput'); if (inp) inp.focus();
   });
 }
-const askText = (title) => dialog('<p><b>' + title + '</b></p><input type="text" id="dlgInput" maxlength="40">', [{ text: 'שמור', value: 'input', cls: 'primary' }, { text: 'ביטול', value: null }]);
+const askText = (title, type) => dialog('<p><b>' + title + '</b></p><input type="' + (type || 'text') + '" id="dlgInput" maxlength="80">', [{ text: 'שמור', value: 'input', cls: 'primary' }, { text: 'ביטול', value: null }]);
 const askConfirm = (txt, yes) => dialog('<p>' + txt + '</p>', [{ text: yes || 'אישור', value: true, cls: 'primary' }, { text: 'ביטול', value: false }]);
 const tell = (html) => dialog(html, [{ text: 'הבנתי', value: true, cls: 'primary' }]);
 
@@ -2184,13 +2356,15 @@ function mkWave(container, color, peaks) {
   cur.style.cssText = 'position:absolute;top:0;bottom:0;width:3px;background:' + cssVar('--cursor') + ';pointer-events:none;z-index:5;left:0';
   const box = document.createElement('div');
   box.style.cssText = 'position:absolute;top:0;bottom:0;background:' + cssVar('--acc2') + ';opacity:.28;pointer-events:none;z-index:4;display:none';
-  wrap.appendChild(box); wrap.appendChild(cur);
+  const ovl = document.createElement('div');
+  ovl.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:3';
+  wrap.appendChild(ovl); wrap.appendChild(box); wrap.appendChild(cur);
   wrap.style.cursor = 'pointer';
   wrap.addEventListener('click', (e) => {
     const r = wrap.getBoundingClientRect();
     P.seek(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * A.orig.durationSec);
   });
-  return { ws, cur, box };
+  return { ws, cur, box, ovl };
 }
 function origScale() { let m = 0; for (let i = 0; i < origPeaks.length; i++) if (origPeaks[i] > m) m = origPeaks[i]; return m > 0 ? 0.92 / m : 1; }
 function procPeaksArr() {
@@ -2229,7 +2403,7 @@ function setZoom(f) {
 $('bZin').onclick = () => setZoom(1.7);
 $('bZout').onclick = () => setZoom(1 / 1.7);
 
-function drawLoop() {
+let drawLoop = function () {
   const L = P.loop, d = A.orig ? A.orig.durationSec : 0;
   [wsO, wsP].forEach((w) => {
     if (!w) return;
@@ -2245,7 +2419,7 @@ function drawLoop() {
   $('loopInfo').innerHTML = s;
   $('bLOn').textContent = L.on ? 'לולאה פעילה' : 'לולאה כבויה';
   $('bLOn').classList.toggle('on', L.on);
-}
+};
 $('bLA').onclick = () => { const p = P.getPos(); P.loop.a = p; if (P.loop.b <= p) P.loop.b = 0; P.loop.on = false; P.loop.count = 0; drawLoop(); };
 $('bLB').onclick = async () => { const p = P.getPos(); if (p <= P.loop.a) { await tell('סוף הקטע צריך להיות אחרי ההתחלה.'); return; } P.loop.b = p; await P.setLoop(true, P.loop.a, p); drawLoop(); };
 $('bLOn').onclick = async () => { if (!(P.loop.b > P.loop.a)) { await tell('קודם סמן התחלה (א) וסוף (ב).'); return; } await P.setLoop(!P.loop.on, P.loop.a, P.loop.b); drawLoop(); };
@@ -2291,7 +2465,8 @@ function frame() {
 /* ===== הכנה מראש ===== */
 let preTok = null, preTimer = null;
 function busy(txt) { const b = $('busy'); if (txt) { b.textContent = txt; b.classList.remove('hide'); } else b.classList.add('hide'); }
-function schedulePre() { clearTimeout(preTimer); preTimer = setTimeout(runPre, 200); }
+let preRun = Promise.resolve();
+function schedulePre() { clearTimeout(preTimer); preTimer = setTimeout(() => { preRun = runPre(); }, 200); }
 async function runPre() {
   if (!A.orig) return;
   const want = preNeeded(A.S) ? preKey(A.S) : 'identity';
@@ -2309,9 +2484,10 @@ async function runPre() {
     if (e.message !== 'cancel') busy('לא הצלחתי לעדכן את התצוגה. נסה הגדרות מתונות יותר או מחשב חזק יותר.');
   } finally { if (preTok === tok) preTok = null; }
 }
+function preKeyMatches() { return A.pre.key === (preNeeded(A.S) ? preKey(A.S) : 'identity'); }
 function updateSavings() {
   const s = A.pre && A.pre.saved;
-  $('savingsLbl').textContent = A.S.silOn && s > 0.5 ? 'חסכת ' + durWords(s) : '';
+  $('savingsLbl').textContent = s > 0.5 ? 'חסכת ' + durWords(s) : '';
 }
 let normTok = null;
 function scheduleNorm() { if (!A.S.normalize) return; clearTimeout(normTimer); normTimer = setTimeout(runNorm, 900); }
@@ -2353,7 +2529,7 @@ async function handleFile(file) {
     loadMsg(e.hebrew ? e.message : 'משהו השתבש בקריאת הקובץ. אם ההקלטה ארוכה מאוד, נסה במחשב.', 'err');
   }
 }
-function onLoaded(o, file) {
+let onLoaded = function (o, file) {
   loadMsg('');
   const mb = (o.size / 1048576).toFixed(1);
   const kbps = Math.round(o.size * 8 / o.durationSec / 1000);
@@ -2371,7 +2547,7 @@ function onLoaded(o, file) {
   const weak = o.durationSec > 1200 && (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || (navigator.deviceMemory && navigator.deviceMemory <= 4));
   $('weak').classList.toggle('hide', !weak);
   $('studio').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+};
 
 let rec = null;
 $('btnRec').onclick = async () => {
@@ -2480,7 +2656,10 @@ $('bMake').onclick = async () => {
   }
   P.pause(); updatePlayBtn();
   const tok = { cancel: false }; makeTok = tok;
-  $('bMake').disabled = true; $('bCancelMake').classList.remove('hide'); $('prog').classList.remove('hide'); $('dl').innerHTML = '';
+  $('bMake').disabled = true; $('progTxt').textContent = 'ממתין לסיום ההכנה...';
+  clearTimeout(preTimer); if (preTok === null && !preKeyMatches()) await runPre(); else await preRun;
+  if (tok.cancel) { makeTok = null; $('bMake').disabled = false; return; }
+   $('bCancelMake').classList.remove('hide'); $('prog').classList.remove('hide'); $('dl').innerHTML = '';
   const setP = (f, txt) => { $('prog').firstElementChild.style.width = Math.round(f * 100) + '%'; $('progTxt').textContent = txt; };
   try {
     for (let j = 0; j < jobs.length; j++) {
@@ -2533,6 +2712,394 @@ if (isHttp && 'serviceWorker' in navigator) navigator.serviceWorker.register('sw
 /* ===== אתחול ===== */
 buildControls(); buildPresets(); fillSecond(); fillFormats(); applyTheme(); syncUI();
 requestAnimationFrame(frame);
+
+/* ===== חיתוך, פרקים, פתיח וסיום, ברירת מחדל, ומספור הכותרות ===== */
+
+const cutSel = { a: null, b: null };
+
+function renumber() {
+  let i = 0;
+  document.querySelectorAll('section.card').forEach((c) => {
+    const n = c.querySelector('h2 .num');
+    if (!n) return;
+    if (c.classList.contains('hide')) { n.textContent = ''; return; }
+    i++; n.textContent = heb(i) + '.';
+  });
+}
+
+/* ----- שכבת סימונים על הגלים: חיתוכים, בחירה ופרקים ----- */
+function drawOverlays() {
+  if (!A.orig) return;
+  const d = A.orig.durationSec;
+  [wsO, wsP].forEach((w) => {
+    if (!w || !w.ovl) return;
+    w.ovl.innerHTML = '';
+    const box = (a, b, color, op, title) => {
+      const e = document.createElement('div');
+      e.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (a / d * 100) + '%;width:max(2px,' + ((b - a) / d * 100) + '%);background:' + color + ';opacity:' + op + ';';
+      if (title) e.title = title;
+      w.ovl.appendChild(e);
+    };
+    A.edit.cuts.forEach((c) => box(c[0], c[1], '#c0392b', 0.45, 'קטע שהוסר'));
+    if (cutSel.a !== null) box(cutSel.a, cutSel.b !== null ? cutSel.b : cutSel.a + d * 0.002, cssVar('--acc2'), 0.5, 'קטע מסומן');
+    A.edit.chapters.forEach((ch) => {
+      const e = document.createElement('div');
+      e.style.cssText = 'position:absolute;top:0;bottom:0;width:3px;left:' + (ch.t / d * 100) + '%;background:' + cssVar('--acc') + ';opacity:.9';
+      e.title = ch.n; w.ovl.appendChild(e);
+    });
+  });
+}
+const _drawLoop = drawLoop;
+drawLoop = function () { _drawLoop(); drawOverlays(); };
+
+/* ----- חיתוך ----- */
+function mergeCuts(list) {
+  list = list.filter((c) => c[1] - c[0] >= 0.2).sort((a, b) => a[0] - b[0]);
+  const out = [];
+  for (const c of list) {
+    if (out.length && c[0] <= out[out.length - 1][1]) out[out.length - 1][1] = Math.max(out[out.length - 1][1], c[1]);
+    else out.push([c[0], c[1]]);
+  }
+  return out;
+}
+function afterEdit() {
+  cutSel.a = cutSel.b = null;
+  renderCuts(); renderChapters(); drawOverlays();
+  schedulePre();
+  if (typeof updateSize === 'function') updateSize();
+}
+const tm = (x) => '<bdi dir="ltr">' + fmtTime(x) + '</bdi>';
+function renderCuts() {
+  const host = $('cutList'); host.innerHTML = '';
+  let total = 0;
+  A.edit.cuts.forEach((c, i) => {
+    total += c[1] - c[0];
+    const row = document.createElement('div'); row.className = 'row'; row.style.margin = '6px 0';
+    row.innerHTML = '<span style="flex:1">' + 'קטע ' + heb(Math.min(i + 1, 13)) + ': מ-' + tm(c[0]) + ' עד ' + tm(c[1]) + ' (' + durWords(c[1] - c[0]) + ')</span>';
+    const jump = document.createElement('button'); jump.type = 'button'; jump.textContent = 'לך לשם'; jump.onclick = () => P.seek(Math.max(0, c[0] - 2));
+    const back = document.createElement('button'); back.type = 'button'; back.textContent = 'החזר את הקטע'; back.onclick = () => { A.edit.cuts.splice(i, 1); afterEdit(); };
+    row.append(jump, back); host.appendChild(row);
+  });
+  $('cutSel').innerHTML = cutSel.a === null ? (A.edit.cuts.length ? 'סך הכל הוסרו ' + durWords(total) + '.' : 'עוד לא סומן קטע.')
+    : 'סומנה התחלה ב-' + tm(cutSel.a) + (cutSel.b !== null ? ' וסוף ב-' + tm(cutSel.b) + '. לחץ "הסר את הקטע המסומן".' : '. עכשיו סמן סוף.');
+}
+$('cutA').onclick = () => { cutSel.a = P.getPos(); if (cutSel.b !== null && cutSel.b <= cutSel.a) cutSel.b = null; renderCuts(); drawOverlays(); };
+$('cutB').onclick = async () => {
+  const p = P.getPos();
+  if (cutSel.a === null) { await tell('קודם סמן התחלת קטע.'); return; }
+  if (p <= cutSel.a) { await tell('סוף הקטע צריך להיות אחרי ההתחלה.'); return; }
+  cutSel.b = p; renderCuts(); drawOverlays();
+};
+$('cutDo').onclick = async () => {
+  if (cutSel.a === null || cutSel.b === null) { await tell('קודם סמן התחלה וסוף של קטע.'); return; }
+  A.edit.cuts = mergeCuts(A.edit.cuts.concat([[cutSel.a, cutSel.b]])); afterEdit();
+};
+$('cutHead').onclick = () => { const p = P.getPos(); if (p < 0.5) return; A.edit.cuts = mergeCuts(A.edit.cuts.concat([[0, p]])); afterEdit(); };
+$('cutTail').onclick = () => { const p = P.getPos(), d = A.orig.durationSec; if (d - p < 0.5) return; A.edit.cuts = mergeCuts(A.edit.cuts.concat([[p, d]])); afterEdit(); };
+
+/* ----- פרקים ----- */
+function renderChapters() {
+  const host = $('chList'); host.innerHTML = '';
+  A.edit.chapters.sort((a, b) => a.t - b.t);
+  A.edit.chapters.forEach((ch, i) => {
+    const row = document.createElement('div'); row.className = 'row'; row.style.margin = '6px 0';
+    const go = document.createElement('button'); go.type = 'button'; go.innerHTML = tm(ch.t); go.onclick = () => P.seek(ch.t);
+    const nm = document.createElement('span'); nm.style.flex = '1'; nm.textContent = ch.n;
+    const ren = document.createElement('button'); ren.type = 'button'; ren.textContent = 'שנה שם';
+    ren.onclick = async () => { const v = await askText('שם הפרק'); if (v && v.trim()) { ch.n = v.trim().slice(0, 80); renderChapters(); drawOverlays(); } };
+    const del = document.createElement('button'); del.type = 'button'; del.className = 'warn'; del.textContent = 'מחק';
+    del.onclick = () => { A.edit.chapters.splice(i, 1); renderChapters(); drawOverlays(); };
+    row.append(go, nm, ren, del); host.appendChild(row);
+  });
+  if (!A.edit.chapters.length) host.innerHTML = '<div class="small">עוד אין פרקים.</div>';
+}
+$('chAdd').onclick = async () => {
+  const t = Math.round(P.getPos() * 10) / 10;
+  const v = await askText('שם הפרק (נקודה ' + fmtTime(t) + ')');
+  if (!v || !v.trim()) return;
+  A.edit.chapters.push({ t, n: v.trim().slice(0, 80) });
+  renderChapters(); drawOverlays();
+};
+
+/* ----- פתיח וסיום קבועים ----- */
+const ASSET_KINDS = [['intro', 'פתיח (בתחילת כל שיעור)'], ['outro', 'סיום (בסוף כל שיעור)']];
+async function renderAssets() {
+  const host = $('assets'); host.innerHTML = '';
+  const on = store.get('kh_assets_on', { intro: false, outro: false });
+  for (const [kind, label] of ASSET_KINDS) {
+    const rec = await idb.get(kind);
+    const row = document.createElement('div'); row.className = 'sl';
+    row.innerHTML = '<div class="head"><label>' + label + '</label></div>' +
+      '<div class="small">' + (rec ? 'נשמר: ' + rec.name + ' (' + tm(rec.dur || 0) + ')' : 'עוד לא נבחר קובץ.') + '</div>';
+    const r = document.createElement('div'); r.className = 'row'; r.style.marginTop = '6px';
+    const lbl = document.createElement('label'); lbl.className = 'btn'; lbl.textContent = rec ? 'החלף קובץ' : 'בחר קובץ קול';
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'audio/*'; inp.className = 'hide';
+    lbl.appendChild(inp);
+    inp.onchange = async () => {
+      const f = inp.files[0]; if (!f) return;
+      try {
+        const ctx = A.ctx || ensureCtx(44100);
+        const buf = await f.arrayBuffer();
+        const dec = await ctx.decodeAudioData(buf.slice(0));
+        if (dec.duration > 60) { await tell('הקובץ ארוך מדי לפתיח או לסיום. בחר קובץ של עד דקה.'); return; }
+        await idb.set(kind, { name: f.name, buf, dur: dec.duration });
+        on[kind] = true; store.set('kh_assets_on', on); A.edit[kind] = true; A.assetVer++;
+        await renderAssets(); if (A.orig) schedulePre();
+      } catch (e) { await tell('לא הצלחתי לקרוא את הקובץ. נסה קובץ אם-פי-3 או וייב.'); }
+    };
+    r.appendChild(lbl);
+    if (rec) {
+      const tg = document.createElement('div'); tg.className = 'tg';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'as_' + kind; cb.checked = !!on[kind];
+      const cl = document.createElement('label'); cl.htmlFor = cb.id; cl.textContent = 'הוסף בכל הפקה';
+      cb.onchange = () => { on[kind] = cb.checked; store.set('kh_assets_on', on); A.edit[kind] = cb.checked; A.assetVer++; if (A.orig) schedulePre(); };
+      tg.append(cb, cl); r.appendChild(tg);
+      const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'warn'; rm.textContent = 'הסר';
+      rm.onclick = async () => { await idb.del(kind); on[kind] = false; store.set('kh_assets_on', on); A.edit[kind] = false; A.assetVer++; await renderAssets(); if (A.orig) schedulePre(); };
+      r.appendChild(rm);
+    }
+    row.appendChild(r); host.appendChild(row);
+    A.edit[kind] = !!(rec && on[kind]);
+  }
+}
+
+/* ----- ברירת מחדל לשיעורים חדשים ----- */
+function showDefaultNote() {
+  const d = store.get('kh_default', null);
+  $('defaultNote').textContent = d ? 'כל שיעור חדש ייפתח עם הערכה "' + d.name + '".' : '';
+  $('bClearDefault').classList.toggle('hide', !d);
+}
+$('bSetDefault').onclick = () => {
+  const v = {}; Object.keys(DEFAULTS).forEach((k) => { v[k] = A.S[k]; });
+  store.set('kh_default', { name: A.presetName, v }); showDefaultNote();
+};
+$('bClearDefault').onclick = () => { store.set('kh_default', null); showDefaultNote(); };
+function applyDefaultIfAny() {
+  const d = store.get('kh_default', null);
+  if (!d) return;
+  A.S = Object.assign({}, DEFAULTS, d.v, { _normDb: 0 }); A.presetName = d.name;
+  $('presetNow').textContent = 'נטענה ברירת המחדל: ' + d.name + '.';
+}
+
+/* חיבור לטעינת קובץ חדש */
+const _onLoaded = onLoaded;
+onLoaded = function (o, file) {
+  A.edit.cuts = []; A.edit.chapters = []; cutSel.a = cutSel.b = null;
+  applyDefaultIfAny();
+  _onLoaded(o, file);
+  $('editCard').classList.remove('hide');
+  if (SITE_MODE) $('pubCard').classList.remove('hide');
+  renderCuts(); renderChapters(); renumber(); showDefaultNote();
+};
+renderAssets(); showDefaultNote();
+if (SITE_MODE) $('siteHome').classList.remove('hide');
+
+/* ===== פרסום לספריית השיעורים של האתר (העלאה וקטלוג). פועל רק בגרסת האתר ===== */
+
+const PUB_API = '/api/audio';
+const SINGLE_MAX = 90 * 1024 * 1024;     /* מעל זה: העלאה בחלקים */
+const PART_SIZE = 16 * 1024 * 1024;      /* חלקים שווים, כנדרש מהאחסון */
+const TIMELINE_KEYS = ['speed', 'vinyl', 'silOn', 'silMin', 'silKeep', 'nr', 'hum', 'mono'];
+
+function adminKeyGet() { try { return localStorage.getItem('zAdminKey') || localStorage.getItem('zeAdminKey') || ''; } catch (e) { return ''; } }
+function adminKeySet(k) { try { if (k) { localStorage.setItem('zAdminKey', k); localStorage.setItem('zeAdminKey', k); } else { localStorage.removeItem('zAdminKey'); localStorage.removeItem('zeAdminKey'); } } catch (e) {} }
+
+class PubError extends Error { constructor(msg, status, he) { super(msg); this.status = status; this.he = he; } }
+
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+/* העלאה בבקשה אחת עם התקדמות */
+function uploadSingle(blob, key, adminKey, onProg, tok) {
+  return new Promise((res, rej) => {
+    const x = new XMLHttpRequest();
+    x.open('POST', PUB_API + '/upload?key=' + encodeURIComponent(key));
+    x.setRequestHeader('x-admin-key', adminKey);
+    x.upload.onprogress = (e) => { if (e.lengthComputable) onProg(e.loaded / e.total); };
+    x.onload = () => {
+      if (x.status === 200) return res();
+      let he = ''; try { he = JSON.parse(x.responseText).he || ''; } catch (e) {}
+      rej(new PubError('upload ' + x.status, x.status, he));
+    };
+    x.onerror = () => rej(new PubError('network', 0));
+    x.onabort = () => rej(new Error('cancel'));
+    if (tok) tok.abort = () => x.abort();
+    x.send(blob);
+  });
+}
+
+/* העלאה בחלקים, עם חידוש: state נשמר אצל הקורא ומאפשר המשך אחרי ניתוק */
+async function uploadMulti(blob, key, adminKey, onProg, tok, state) {
+  const H = { 'x-admin-key': adminKey };
+  const post = async (qs, body, json) => {
+    const r = await fetch(PUB_API + '/mp?' + qs, { method: 'POST', headers: H, body });
+    let j = null; try { j = await r.json(); } catch (e) {}
+    if (!r.ok || !j || !j.ok) throw new PubError('mp ' + r.status, r.status, j && j.he);
+    return j;
+  };
+  const kq = 'key=' + encodeURIComponent(key);
+  if (!state.uploadId) { state.uploadId = (await post('act=start&' + kq)).uploadId; state.parts = []; }
+  const total = Math.ceil(blob.size / PART_SIZE);
+  for (let n = state.parts.length + 1; n <= total; n++) {
+    if (tok && tok.cancel) throw new Error('cancel');
+    const chunk = blob.slice((n - 1) * PART_SIZE, Math.min(blob.size, n * PART_SIZE));
+    let ok = false, last;
+    for (let attempt = 0; attempt < 4 && !ok; attempt++) {
+      try {
+        const j = await post('act=part&' + kq + '&uploadId=' + encodeURIComponent(state.uploadId) + '&n=' + n, chunk);
+        state.parts.push({ n, etag: j.etag }); ok = true;
+      } catch (e) { last = e; if (e.status === 403 || e.status === 503) throw e; await sleep(1500 * (attempt + 1)); }
+    }
+    if (!ok) throw last;
+    onProg(n / total);
+  }
+  await post('act=done&' + kq + '&uploadId=' + encodeURIComponent(state.uploadId), JSON.stringify({ parts: state.parts }));
+}
+
+async function uploadAny(item, adminKey, onProg, tok) {
+  if (item.blob.size <= SINGLE_MAX) await uploadSingle(item.blob, item.key, adminKey, onProg, tok);
+  else { item.mp = item.mp || {}; await uploadMulti(item.blob, item.key, adminKey, onProg, tok, item.mp); }
+  item.uploaded = true;
+}
+
+async function catalogPost(body, adminKey) {
+  const r = await fetch(PUB_API + '/catalog', { method: 'POST', headers: { 'content-type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify(body) });
+  let j = null; try { j = await r.json(); } catch (e) {}
+  if (!r.ok || !j || !j.ok) throw new PubError('catalog ' + r.status + ' ' + (j && j.error || ''), r.status);
+  return j;
+}
+
+function newRecId() { return 'rec_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6); }
+const EXT_OF = { mp3: 'mp3', opus: 'opus', wav: 'wav' };
+
+/* הודעת שגיאה בעברית לפי הסטטוס */
+function pubErrorText(e) {
+  if (e && e.message === 'cancel') return 'הפרסום בוטל.';
+  if (e && e.status === 403) return 'מפתח המנהל שגוי או שפג תוקפו. הזן אותו שוב ולחץ שוב על פרסום.';
+  if (e && e.status === 503) return e.he || 'אחסון הקבצים באתר עדיין לא פעיל, ולכן אי אפשר להעלות.';
+  if (e && e.status === 413) return 'הקובץ גדול מדי להעלאה. בחר חד-ערוצי או אופוס כדי להקטין אותו.';
+  if (e && e.status === 0) return 'אין חיבור לאינטרנט. החיבור יחזור ואפשר ללחוץ שוב, ההעלאה תמשיך מהמקום שנעצר.';
+  return 'הפרסום נכשל. נסה שוב, ואם זה חוזר, שמור את הקובץ בהורדה ופנה לתמיכה.';
+}
+
+/* ===== ממשק הפרסום (גרסת האתר בלבד) ===== */
+if (SITE_MODE) {
+  const PF = [
+    ['title', 'כותרת השיעור', 'text', 'full'], ['series', 'סדרה', 'text'], ['seriesNo', 'מספר בסדרה', 'number'],
+    ['pkey', 'פרשה או כתב (שיוך לדף הזוהר)', 'pkey'], ['daf', 'דף (וילנא)', 'text'], ['amud', 'עמוד', 'amud'],
+    ['siman', 'סימן', 'text'], ['topic', 'נושא', 'text'], ['readType', 'סוג', 'sel', READ_TYPES], ['tradition', 'מסורת', 'sel', TRADS],
+    ['reader', 'שם המוסר', 'text'], ['recDate', 'תאריך ההקלטה', 'text'], ['quality', 'איכות ההקלטה', 'sel', QUALITIES],
+    ['lang', 'שפה', 'sel', LANGS], ['tags', 'תגיות (מופרדות בפסיק)', 'text', 'full'], ['desc', 'תיאור', 'area', 'full'],
+  ];
+  const KEEP = ['series', 'reader', 'tradition', 'quality', 'lang', 'readType'];
+  const memo = store.get('kh_pub_memo', {});
+  const form = $('pubForm'); form.innerHTML = '';
+  PF.forEach(([id, label, kind, extra]) => {
+    const d = document.createElement('div'); if (extra === 'full' || kind === 'area') d.className = 'full';
+    const fid = 'p_' + id; let ctl;
+    if (kind === 'pkey') {
+      ctl = '<select id="' + fid + '"><option value="">ללא שיוך</option>' + Object.keys(BOOKS).map((b) => '<optgroup label="' + b + '">' + BOOKS[b].map((k) => '<option value="' + k + '">' + (PNAMES[k] || k) + '</option>').join('') + '</optgroup>').join('') + '</select>';
+    } else if (kind === 'amud') ctl = '<select id="' + fid + '"><option value=""></option><option>א</option><option>ב</option></select>';
+    else if (kind === 'sel') ctl = '<select id="' + fid + '"><option value=""></option>' + extra.map((x) => '<option>' + x + '</option>').join('') + '</select>';
+    else if (kind === 'area') ctl = '<textarea id="' + fid + '" rows="3"></textarea>';
+    else ctl = '<input id="' + fid + '" type="' + kind + '"' + (kind === 'number' ? ' min="0"' : '') + '>';
+    d.innerHTML = '<label for="' + fid + '">' + label + '</label>' + ctl;
+    form.appendChild(d);
+    const el = d.querySelector('#' + fid); if (el && memo[id]) el.value = memo[id];
+  });
+  const val = (id) => { const e = $('p_' + id); return e ? e.value.trim() : ''; };
+
+  function fillTitleGuess() { if (!val('title') && A.orig) $('p_title').value = A.orig.name.replace(/_/g, ' ').slice(0, 120); }
+  const _ol = onLoaded; onLoaded = function (o, f) { _ol(o, f); fillTitleGuess(); renderPubVariants(); };
+
+  function renderPubVariants() {
+    const host = $('pubVariants'); host.innerHTML = '';
+    allPresets().forEach((p, i) => {
+      const w = document.createElement('label'); w.className = 'tg';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.dataset.i = i;
+      cb.onchange = () => { if (host.querySelectorAll('input:checked').length > 3) { cb.checked = false; tell('אפשר עד שלוש גרסאות נוספות.'); } };
+      w.append(cb, document.createTextNode(' ' + p.name)); host.appendChild(w);
+    });
+  }
+
+  let tok = null, st = null;
+  const setP = (f, txt) => { $('pubProg').classList.remove('hide'); $('pubProg').firstElementChild.style.width = Math.round(f * 100) + '%'; $('pubTxt').textContent = txt; };
+
+  async function ensureKey() {
+    let k = adminKeyGet();
+    if (k) return k;
+    k = await askText('מפתח מנהל', 'password');
+    if (!k || !k.trim()) return '';
+    adminKeySet(k.trim()); return k.trim();
+  }
+
+  $('bPubCancel').onclick = () => { if (tok) { tok.cancel = true; if (tok.abort) tok.abort(); } };
+  $('bPublish').onclick = async () => {
+    if (!A.orig || tok) return;
+    if (!val('title') && !val('pkey') && !val('topic')) { await tell('נא למלא כותרת לשיעור, או לפחות פרשה או נושא.'); return; }
+    const key = await ensureKey(); if (!key) return;
+    KEEP.forEach((k) => { memo[k] = val(k); }); store.set('kh_pub_memo', memo);
+    tok = { cancel: false }; $('bPublish').disabled = true; $('bPubCancel').classList.remove('hide'); $('pubDone').innerHTML = '';
+    try {
+      /* ממתין לסיום ההכנה המקדימה */
+      setP(0, 'ממתין לסיום ההכנה...');
+      clearTimeout(preTimer); if (preTok === null && !preKeyMatches()) await runPre(); else await preRun;
+      const fmt = $('fmt').value || 'mp3';
+      const S0 = Object.assign({}, A.S), pre = A.pre;
+      /* ההכנה: מתחילים מחדש רק אם לא קיים מצב שמור מניסיון קודם באותה הגדרה */
+      const sig = JSON.stringify([S0, fmt, A.edit, $('pubVariants').innerHTML.length, pre.key]);
+      if (!st || st.sig !== sig) {
+        const id = newRecId(), ext = EXT_OF[fmt], extras = [...$('pubVariants').querySelectorAll('input:checked')].map((c) => allPresets()[parseInt(c.dataset.i, 10)]);
+        const items = [{ label: 'main', S: S0, key: 'recordings/' + id + '.' + ext }];
+        extras.forEach((p, i) => {
+          const Sv = Object.assign({}, DEFAULTS, p.v, { _normDb: 0 });
+          TIMELINE_KEYS.forEach((k) => { Sv[k] = S0[k]; });
+          items.push({ label: p.name, S: Sv, key: 'recordings/' + id + '_v' + (i + 2) + '.' + ext });
+        });
+        st = { sig, id, items, fmt };
+      }
+      const nV = st.items.length, share = 1 / nV;
+      for (let i = 0; i < nV; i++) {
+        const it = st.items[i], tag = nV > 1 ? 'גרסה ' + heb(i + 1) + ': ' : '';
+        if (!it.blob) {
+          it.blob = await produce(it.S, fmt, tok, (p) => setP((i + p.frac * 0.5) * share, tag + 'מפיק את הקובץ: ' + Math.round(p.frac * 100) + ' אחוז' + (p.eta ? ', נותרו כ-' + durWords(p.eta) : '')), pre);
+        }
+        if (!it.uploaded) {
+          await uploadAny(it, key, (f) => setP((i + 0.5 + f * 0.5) * share * 0.98, tag + 'מעלה לאתר: ' + Math.round(f * 100) + ' אחוז'), tok);
+          it.uploaded = true;
+        }
+      }
+      /* מפת שתיקות, פרקים וקטלוג */
+      setP(0.985, 'שומר את פרטי השיעור...');
+      const E0 = derive(S0), tempo = E0.tempo;
+      const sil = silenceMapFinal(pre, tempo);
+      let silf;
+      if (sil.length >= 2) {
+        silf = 'timings/' + st.id + '.sil.json';
+        await uploadAny({ blob: new Blob([JSON.stringify({ v: 1, sil })], { type: 'application/json' }), key: silf }, key, () => {}, tok);
+      }
+      const chapters = A.edit.chapters.map((c) => ({ t: Math.round(finalTimeOf(pre, tempo, c.t) * 10) / 10, n: c.n }));
+      const pk = val('pkey');
+      const rec = {
+        id: st.id, file: st.items[0].key, size: st.items[0].blob.size, dur: Math.round(pre.len / pre.sr / tempo),
+        title: val('title'), series: val('series'), seriesNo: val('seriesNo') ? Number(val('seriesNo')) : undefined,
+        pkey: pk, parsha: pk ? (PNAMES[pk] || pk) : '', book: pk ? bookOf(pk) : '', daf: val('daf'), amud: val('amud'), siman: val('siman'), topic: val('topic'),
+        readType: val('readType'), tradition: val('tradition'), reader: val('reader'), recDate: val('recDate'), quality: val('quality'), lang: val('lang'),
+        tags: val('tags').split(',').map((s) => s.trim()).filter(Boolean), desc: val('desc'),
+        variants: st.items.slice(1).map((it) => ({ label: it.label, file: it.key, size: it.blob.size })),
+        chapters, silf, hidden: $('pubDraft').checked ? true : undefined, pub: $('pubDate').value || undefined,
+      };
+      await catalogPost({ act: 'add', rec }, key);
+      setP(1, 'הסתיים. השיעור נשמר בספרייה.');
+      $('pubDone').innerHTML = '<a href="זוהר-אודיו?rec=' + encodeURIComponent(st.id) + '">פתח את השיעור בספריית השיעורים</a>';
+      st = null;
+    } catch (e) {
+      if (e && e.status === 403) adminKeySet('');
+      $('pubTxt').textContent = pubErrorText(e);
+    } finally {
+      tok = null; $('bPublish').disabled = false; $('bPubCancel').classList.add('hide');
+    }
+  };
+}
 
 </script>
 </body>

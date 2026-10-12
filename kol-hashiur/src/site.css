@@ -1,0 +1,20 @@
+/* עיצוב גרסת האתר: אותה פלטה וגופנים כמו שאר דפי ממלכת הזוהר */
+:root{
+  --bg:#fbfaf7;--card:#ffffff;--ink:#1d2433;--mute:#5b6373;--line:#e4e1d8;
+  --acc:#1f3a63;--acc-ink:#ffffff;--acc2:#8a6d33;--warn:#a33c2e;--ok:#17692f;--wave:#1f3a63;--wave2:#b99552;--cursor:#a33c2e;--track:#e4e1d8;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14171f;--card:#1c212c;--ink:#e8e6df;--mute:#9aa1b0;--line:#2b3140;
+  --acc:#8fb0dd;--acc-ink:#0f1722;--acc2:#d8bc82;--warn:#e08a7a;--ok:#6fdc8c;--wave:#8fb0dd;--wave2:#c2a468;--cursor:#e08a7a;--track:#2b3140;}}
+:root[data-theme="dark"]{
+  --bg:#14171f;--card:#1c212c;--ink:#e8e6df;--mute:#9aa1b0;--line:#2b3140;
+  --acc:#8fb0dd;--acc-ink:#0f1722;--acc2:#d8bc82;--warn:#e08a7a;--ok:#6fdc8c;--wave:#8fb0dd;--wave2:#c2a468;--cursor:#e08a7a;--track:#2b3140;}
+body{font-family:'Heebo','Segoe UI','Noto Sans Hebrew',Arial,sans-serif}
+header.top h1,.card h2{font-family:'Frank Ruhl Libre','David',Georgia,serif}
+.drop{border-color:#b99552;background:rgba(185,149,82,.1)}
+.chip{background:rgba(185,149,82,.16)}
+.frm{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px 14px;margin:10px 0}
+.frm .full{grid-column:1/-1}
+.frm label{display:block;font-size:.8rem;color:var(--mute)}
+.frm input,.frm select,.frm textarea{width:100%;font:inherit;min-height:48px;padding:6px 10px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.frm textarea{min-height:90px}
