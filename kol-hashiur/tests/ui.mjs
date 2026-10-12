@@ -1,6 +1,6 @@
 import { chromium } from 'playwright-core';
-const T = '/tmp/claude-0/-home-user-or-yakar-mcp/f9cc8d6e-a55d-5c1b-a5b6-9431b5dd331b/scratchpad/t';
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] });
+const T = (process.env.TEST_AUDIO_DIR || '.');
+const b = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] });
 const errs = [];
 async function run(scheme, w) {
   const c = await b.newContext({ viewport: { width: w, height: 900 }, colorScheme: scheme, permissions: ['microphone'] });

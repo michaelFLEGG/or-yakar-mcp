@@ -104,6 +104,13 @@ const siteHead = [
 fs.mkdirSync(path.join(dist, 'site'), { recursive: true });
 fs.writeFileSync(path.join(dist, 'site', 'זוהר-סטודיו.html'), assemble(siteHead, false, true).replace('<title>סטודיו קול השיעור</title>', '<title>סטודיו קול השיעור · ממלכת הזוהר</title>'));
 
+// כשהמקור יושב בתוך מאגר האתר (תיקיית קול-השיעור), הדף נכתב גם לשורש המאגר: שם הוא מתפרסם
+const repoRoot = path.dirname(root);
+if (fs.existsSync(path.join(repoRoot, 'זוהר-אודיו.html'))) {
+  fs.copyFileSync(path.join(dist, 'site', 'זוהר-סטודיו.html'), path.join(repoRoot, 'זוהר-סטודיו.html'));
+  console.log('נכתב גם: זוהר-סטודיו.html בשורש המאגר');
+}
+
 // עובד שירות לעבודה בלי אינטרנט
 const version = Date.now().toString(36);
 fs.writeFileSync(path.join(dist, 'sw.js'), `const CACHE = 'kol-hashiur-${version}';
@@ -123,7 +130,7 @@ fs.writeFileSync(path.join(dist, '_headers'), '/*\n  Cache-Control: no-cache\n/s
 for (const f of fs.readdirSync(dist)) {
   if (/\.(html|js|webmanifest|svg)$/.test(f)) {
     const t = fs.readFileSync(path.join(dist, f), 'utf8');
-    if (/[–—]/.test(t)) { console.error('נמצא מקף ארוך ב-' + f); process.exit(1); }
+    if (/[\u2013\u2014]/.test(t)) { console.error('נמצא מקף ארוך ב-' + f); process.exit(1); }
   }
 }
 console.log('נבנה בהצלחה:', fs.readdirSync(dist).join(', '));

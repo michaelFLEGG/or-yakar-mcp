@@ -1,8 +1,8 @@
 import { chromium } from 'playwright-core';
 import fs from 'node:fs';
-const T = '/tmp/claude-0/-home-user-or-yakar-mcp/f9cc8d6e-a55d-5c1b-a5b6-9431b5dd331b/scratchpad/t';
+const T = (process.env.TEST_AUDIO_DIR || '.');
 const url = process.argv[2] || 'http://127.0.0.1:8765/index.html';
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] });
 const ctx = await browser.newContext({ viewport: { width: 380, height: 800 }, acceptDownloads: true, permissions: ['microphone'] });
 const page = await ctx.newPage();
 const errs = [];

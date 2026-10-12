@@ -1,6 +1,6 @@
 import { chromium } from 'playwright-core';
-const T = '/tmp/claude-0/-home-user-or-yakar-mcp/f9cc8d6e-a55d-5c1b-a5b6-9431b5dd331b/scratchpad/t';
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+const T = (process.env.TEST_AUDIO_DIR || '.');
+const b = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
 const c = await b.newContext({ viewport: { width: 1000, height: 800 } });
 const p = await c.newPage();
 const errs = []; p.on('pageerror', (e) => errs.push(e.message));

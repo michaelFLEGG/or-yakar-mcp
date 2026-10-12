@@ -1,7 +1,7 @@
 import { chromium } from 'playwright-core';
-const T = '/tmp/claude-0/-home-user-or-yakar-mcp/f9cc8d6e-a55d-5c1b-a5b6-9431b5dd331b/scratchpad/t';
+const T = (process.env.TEST_AUDIO_DIR || '.');
 const base = 'http://127.0.0.1:8766';
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'] });
+const b = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'] });
 const c = await b.newContext({ viewport: { width: 1100, height: 900 } });
 const p = await c.newPage();
 const errs = []; p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => ['error'].includes(m.type()) && !/404/.test(m.text()) && errs.push(m.text()));
